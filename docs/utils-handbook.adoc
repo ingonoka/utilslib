@@ -1,0 +1,161 @@
+= Utils Library Handbook
+Ingo Noka
+:toc:
+:sectnums:
+:service-name: utils
+
+include::../../common-versions/versions/dependencies_section.adoc[leveloffset=+1]
+
+== Introduction
+The `utils` library provides functions that are commonly used across all projects.
+
+== Usage
+
+=== Base64
+Very fast BASE64 encoding functions based on lookup tables.
+
+|====
+|Function|Purpose
+
+| `toBase64()`
+| Convert UTF-8 String to Base64 string
+2+| `"foob".toUtf8().toBase64() == "Zm9vYg=="`
+
+|`decodeToString()`
+| Take base64 string and convert to String
+2+|`"Zm9vYg==".fromBase64().decodeToString()`
+
+|`Char.isBase64()` +
+`String.isBase64()`
+| Check whether a character or String is in the Base64 alphabet
+2+| `'='.isBase64()`, `"ABC".isBase64()`
+
+|`PoorMansByteBuffer.fromBase64(): ByteArray`
+| Convert the bytes in a `PoorMansByteBuffer` to a Base64 string
+
+|`ByteArray.fromBase64(): ByteArray`
+| Convert the bytes in a `ByteArray` to a Base64 string
+|
+|====
+
+=== Logger
+Make SLF4J logge available for common code.  Create a logger with `getLogger(name: String): Logger` and then use it the same way as a logger created directly with `LoggerFactory.getLogger(...)`.  For examle, `val logger = getLogger("Test"); logger.warn("Warning")`.
+
+=== Date Functions
+Convert seconds to a UTC string: `0L.epochSecondsToString() == "1970-01-01T00:00:00+00:00"`.
+
+Convert a String to secinds: `"1970-01-01T00:00:00+00:00".asUtcToEpochSeconds()`
+
+=== Duration Function
+
+Interpret a String as a duration description and convert into number of seconds and vice versa.
+
+- "PT15S"     -- parses as "15 Seconds"
+- "PT15M"     -- parses as "15 minutes" (where a minute is 60 seconds)
+- "PT10H"     -- parses as "10 hours" (where an hour is 3600 seconds)
+- "P2D"       -- parses as "2 days" (where a day is 24 hours or 86400 seconds)
+- "P2DT3H4M"  -- parses as "2 days, 3 hours and 4 minutes"
+
+=== Initialize a Variable Thread-Safe
+
+
+.Usage:
+[source,kotlin]
+----
+ val field = InitOnceThreadSafe<String>()
+ val prop by field
+
+ fun set() {
+    prop.initWith("A string")
+ }
+
+ fun test() {
+     if(prop != null) { println(prop) }
+ }
+----
+
+=== Luhn Checksum Creation and Validation
+
+[source,kotlin]
+----
+"7992739871".luhnCheckSum() // is 3
+listOf(7, 9, 9, 2, 7, 3, 9, 8, 7, 1).luhnCheckSum() // is 3
+7992739871L.luhnCheckSum() // is 3
+"79927398713".validateLuhnChecksum() // is true
+listOf(7, 9, 9, 2, 7, 3, 9, 8, 7, 1, 3).validateLuhnChecksum() // is true
+79927398713.validateLuhnChecksum() // is true
+----
+
+=== PoorMansByteBuffer
+
+Works like a `ByteBuffer` backed by a `ByteArray`.
+
+- If the data to be written to the buffer does not fit into the underlying byte array, then the array will be extended.
+- The buffer capacity will be increased by multiples of the initial size of the buffer.  For example, writing 129 bytes to a buffer that is 128 bytes long will result in a buffer with a capacity of 256 bytes.
+- Rewinding the buffer results in a truncation of the underlying byte array to the actual size of the content, i.e. the size of the underlying byte array will potentially not be a multiple of the initial size anymore.
+- An attempt to read data from the buffer for which there are not enough bytes will result in a SingleResult.Failure response.
++
+[source,kotlin]
+----
+// Throw exception of buf doesn't have 4 more bytes left
+var nextInt = buf.readInt().readInt().materialize { throw it }
+// Set value to a default, if buffer doesn't have enough bytes
+var nextInt = buf.readInt().readInt().materialize { -1 }
+// Use map to convert the data read from the buf
+buf.rewind()
+val hb: HeartBeat = buf.readByteArray(buf.size).map {
+    HeartBeat.parseFrom(it)
+}.materialize { throw it }
+----
+- Reading and writing of Int and Long takes 4 and 8 bytes and is ordered in big endian notation
+
+=== Single Result
+
+`SingleResult` wraps a success or failure of a function.
+
+A successful result can be converted to another value with `.map{}`. The wrapped value can be extracted with `.materialize{}`, which takes a lambda function that will be called iof the result is a failure.  `materialize` can be used to either throw an exception or return a default value.
+
+-----
+fun test(): SingleResult<String> = try {
+
+    result: String = ...
+
+    SingleResult.success(result)
+
+} catch(e: Exception) {
+
+    SingleResult.failure("Failed test", e)
+}
+
+val result = test().materialize { throw it }
+// or
+if(result.isFailure()) { ... }
+if(result.isSuccess()) { ... }
+-----
+
+=== Singleton Holder
+Class to hold a Singleton that can be initialized with arguments, which is not possible with the Kotlin `object`
+
+.Declare a Singleton
+[source,kotlin]
+----
+class Manager private constructor(context: Context) {
+    init { /* Init using context argument*/ }
+    companion object : SingletonHolder<Manager, Context>(::Manager)
+ }
+----
+
+.Use a Singleton
+[source,kotlin]
+----
+// Throws, if called more than once
+Manager.initialize(context)
+Manager.getInstance().doStuff()
+// Or, initialize on first call and return object on following call
+Manager.getInstance(context).doStuff()
+----
+
+
+
+include::../../common-docs/copyright.adoc[]
+
