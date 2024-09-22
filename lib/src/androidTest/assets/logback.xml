@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c) 2021. Ingo Noka
+  ~ This file belongs to project utils-mp.
+  ~ This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ~ To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/3.0/ or send a letter to
+  ~ Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+  ~
+  -->
+
+<configuration>
+
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <appender name="console" class="ch.qos.logback.classic.android.LogcatAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <root level="ALL">
+        <appender-ref ref="console"/>
+    </root>
+
+    <logger name="com.ingonoka.utils.CommonLoggerTest" level="ERROR" />
+
+
+</configuration>
