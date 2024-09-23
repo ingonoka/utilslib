@@ -13,12 +13,12 @@ import kotlin.time.Duration
  * Collect from flow and submit received elements when received in less than [timeout]. If no
  * element has been received within [timeout], submit an empty list.
  *
- * Intended to be used for situation in which new arriving elements should be submitted immediately.
- * For example, a system in which heartbeats may be submitted based on events in the system (i.e.
+ * Intended to be used for a situation in which new arriving elements should be submitted immediately.
+ * For example, a system in which heartbeats may be submitted based on events in the system (i.e.,
  * unpredictable) and in which a heartbeat must be submitted every [timeout] intervals
  * regardless whether any event in the system triggered a heartbeat.
  */
-suspend fun <E> Flow<E>.withTimeout(timeout: Duration): Flow<List<E>> =
+fun <E> Flow<E>.withTimeout(timeout: Duration): Flow<List<E>> =
     flow {
 
         coroutineScope {
@@ -65,7 +65,7 @@ suspend fun <E> Flow<E>.withTimeout(timeout: Duration): Flow<List<E>> =
  * been reached, whatever comes first. If [interval] is over, but no elements have been received, then
  * submit the empty list if [submitEmpty] is true, otherwise do nothing and keep collecting.
  */
-suspend fun <E> Flow<E>.chunked(interval: Duration, maxElements: Int, submitEmpty: Boolean = false): Flow<List<E>> =
+fun <E> Flow<E>.chunked(interval: Duration, maxElements: Int, submitEmpty: Boolean = false): Flow<List<E>> =
     flow {
 
         coroutineScope {

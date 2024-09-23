@@ -14,40 +14,32 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlin.time.ExperimentalTime
 
 class Base64KtTest {
 
-    @ExperimentalStdlibApi
     @Test
     fun testToBase64() {
 
-        assertTrue("Zg==".toUtf8().contentEquals("f".toUtf8().toBase64()))
-        assertTrue("Zm8=".toUtf8().contentEquals("fo".toUtf8().toBase64()))
-        assertTrue("Zm9v".toUtf8().contentEquals("foo".toUtf8().toBase64()))
-        assertTrue("Zm9vYg==".toUtf8().contentEquals("foob".toUtf8().toBase64()))
-        assertTrue("Zm9vYmE=".toUtf8().contentEquals("fooba".toUtf8().toBase64()))
-        assertTrue("Zm9vYmFy".toUtf8().contentEquals("foobar".toUtf8().toBase64()))
+        assertEquals("Zg==", "f".encodeToByteArray().toBase64().decodeToString())
+        assertEquals("Zm8=", "fo".encodeToByteArray().toBase64().decodeToString())
+        assertEquals("Zm9v", "foo".encodeToByteArray().toBase64().decodeToString())
+        assertEquals("Zm9vYg==", "foob".encodeToByteArray().toBase64().decodeToString())
+        assertEquals("Zm9vYmE=", "fooba".encodeToByteArray().toBase64().decodeToString())
+        assertEquals("Zm9vYmFy", "foobar".encodeToByteArray().toBase64().decodeToString())
 
-        assertEquals("Zg==", "f".toBase64())
-        assertEquals("Zm8=", "fo".toBase64())
-        assertEquals("Zm9v", "foo".toBase64())
-        assertEquals("Zm9vYg==", "foob".toBase64())
-        assertEquals("Zm9vYmE=", "fooba".toBase64())
-        assertEquals("Zm9vYmFy", "foobar".toBase64())
-
-        val actual = ("8505435056303161564F06514341543031634CC103131388C2020113C3045D78DCB6C4020384DE37023034021" +
+        val bytes = ("8505435056303161564F06514341543031634CC103131388C2020113C3045D78DCB6C4020384DE37023034021" +
                 "859527B7951E77EB6CB250149FFA2006B1A415297D13AA48A021840986DC05DB2235088DB459938982" +
-                "3A324842E73A635B3FD").hexToBytes().toBase64()
+                "3A324842E73A635B3FD").hexToBytes()
+
         val expected =
             ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
-                    "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").toUtf8()
+                    "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").encodeToByteArray()
 
-        assertTrue(expected.contentEquals(actual))
+        assertTrue(expected.contentEquals(bytes.toBase64()))
+
+        assertArrayEquals(expected.toTypedArray(), IntBuffer.wrap(bytes).toBase64().toTypedArray())
     }
 
-    @ExperimentalTime
-    @ExperimentalStdlibApi
     @Test
     fun testFromBase64() {
 
@@ -58,12 +50,12 @@ class Base64KtTest {
         assertEquals("fooba", "Zm9vYmE=".fromBase64().decodeToString())
         assertEquals("foobar", "Zm9vYmFy".fromBase64().decodeToString())
 
-        assertTrue("f".toUtf8().contentEquals("Zg==".toUtf8().fromBase64()))
-        assertTrue("fo".toUtf8().contentEquals("Zm8=".toUtf8().fromBase64()))
-        assertTrue("foo".toUtf8().contentEquals("Zm9v".toUtf8().fromBase64()))
-        assertTrue("foob".toUtf8().contentEquals("Zm9vYg==".toUtf8().fromBase64()))
-        assertTrue("fooba".toUtf8().contentEquals("Zm9vYmE=".toUtf8().fromBase64()))
-        assertTrue("foobar".toUtf8().contentEquals("Zm9vYmFy".toUtf8().fromBase64()))
+        assertTrue("f".encodeToByteArray().contentEquals("Zg==".encodeToByteArray().fromBase64()))
+        assertTrue("fo".encodeToByteArray().contentEquals("Zm8=".encodeToByteArray().fromBase64()))
+        assertTrue("foo".encodeToByteArray().contentEquals("Zm9v".encodeToByteArray().fromBase64()))
+        assertTrue("foob".encodeToByteArray().contentEquals("Zm9vYg==".encodeToByteArray().fromBase64()))
+        assertTrue("fooba".encodeToByteArray().contentEquals("Zm9vYmE=".encodeToByteArray().fromBase64()))
+        assertTrue("foobar".encodeToByteArray().contentEquals("Zm9vYmFy".encodeToByteArray().fromBase64()))
 
 
         val expected = ("8505435056303161564F06514341543031634CC103131388C2020113C3045D78DCB6C4020384DE37023034021" +
@@ -96,7 +88,7 @@ class Base64KtTest {
     @Test
     fun testSpeedByteArrayFromBase64() {
         val arr = ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
-                "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").toUtf8()
+                "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").encodeToByteArray()
 
         repeat(1000000) { arr.fromBase64() }
 
@@ -104,9 +96,9 @@ class Base64KtTest {
 
     @Test
     fun testSpeedByteReadPacketFromBase64() {
-        val arr = PoorMansByteBuffer(
+        val arr = IntBuffer.wrap(
             ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
-                    "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").toUtf8()
+                    "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").encodeToByteArray()
         )
 
         repeat(1000000) { arr.fromBase64() }

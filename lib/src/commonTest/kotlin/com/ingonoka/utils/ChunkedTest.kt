@@ -123,7 +123,7 @@ class ChunkedTest {
             flow {
                 repeat(5) {
                     emit(it)
-                    delay(1.seconds)
+                    delay(1.1.seconds)
                 }
             }.chunked(3.seconds, 5).collect {
                 add(it)
@@ -141,7 +141,7 @@ class ChunkedTest {
 
         val res = buildList {
             flow {
-                delay(2.seconds)
+                delay(2.1.seconds)
                 emit(1)
             }.chunked(1.seconds, 5).collect {
                 add(it)

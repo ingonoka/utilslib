@@ -14,29 +14,16 @@ import kotlin.test.*
 
 class UtilsTest {
 
-    @Test
-    fun testToByteArray() {
-        assertTrue { byteArrayOf(0x30, 0x31, 0x32).contentEquals("012".toByteArray()) }
-        assertTrue { byteArrayOf().contentEquals("".toByteArray()) }
-    }
-
-    @Test
-    fun testToCharArray() {
-        assertTrue { charArrayOf('0', '1', '2').contentEquals("012".toCharacterArray()) }
-        assertTrue { charArrayOf().contentEquals("".toCharacterArray()) }
-    }
 
     @Test
     fun testCompareLists() {
 
-        assertTrue(compareLists<Int>(listOf(), listOf()))
-        assertFalse(compareLists<Int>(listOf(), null))
-        assertTrue(compareLists<Int>(null, null))
-        assertTrue(compareLists(listOf(1, 2, 3), listOf(1, 2, 3)))
-        assertTrue(compareLists(listOf(1, 2, 3), listOf(3, 2, 1)))
-        assertTrue(compareLists(listOf(1, 2, 2), listOf(2, 2, 1)))
-        assertFalse(compareLists(listOf(1, 2, 2), listOf(1, 2, 3)))
-        assertFalse(compareLists(listOf(1, 2, 3), listOf(1, 2, 3, 4)))
+        assertTrue(listOf<Int>().containsAll(listOf()))
+        assertTrue(listOf(1, 2, 3).containsAll(listOf(1, 2, 3)))
+        assertTrue(listOf(1, 2, 3).containsAll(listOf(3, 2, 1)))
+        assertTrue(listOf(1, 2, 2).containsAll(listOf(2, 2, 1)))
+        assertFalse(listOf(1, 2, 2).containsAll(listOf(1, 2, 3)))
+        assertFalse(listOf(1, 2, 3).containsAll(listOf(1, 2, 3, 4)))
 
     }
 

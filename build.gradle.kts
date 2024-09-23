@@ -10,12 +10,11 @@
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import java.io.ByteArrayOutputStream
 
-buildscript{
-
-    repositories {
-        google()
-        mavenCentral()
-    }
+plugins {
+    //trick: for the same plugin versions in all submodules
+    alias(libs.plugins.androidLibrary).apply(false)
+    alias(libs.plugins.kotlinMultiplatform).apply(false)
+    alias(libs.plugins.asciiDocGradlePlugin)
 }
 
 repositories {
@@ -23,35 +22,21 @@ repositories {
     mavenCentral()
 }
 
-plugins {
-//    id("root.publication")
-    //trick: for the same plugin versions in all submodules
-//    alias(libs.plugins.androidLibrary).apply(false)
-    alias(libs.plugins.kotlinMultiplatform).apply(false)
-    alias(libs.plugins.asciiDocGradlePlugin)
-}
-
-allprojects {
-    group = "com.ingonoka"
-    version = getVersionName()
-}
-
+project.group = "com.ingonoka"
+project.version = getVersionName()
 
 /**
  * Get a version name of the form "v0.3-8-g9518e52", which is the tag
  * assigned to the commit (v0.3), the number of commits since the
  * commit the tag is assigned to and the hash of the latest commit
  */
-fun getVersionName(): String = try {
+fun getVersionName(): String {
     val stdout = ByteArrayOutputStream()
     exec {
         commandLine = listOf("git", "describe", "--tags") //, '--long'
         standardOutput = stdout
     }
-    stdout.toString().trim()
-} catch (e: Exception) {
-    println(e.message)
-    "na"
+    return stdout.toString().trim()
 }
 
 tasks {

@@ -9,7 +9,8 @@
 
 package com.ingonoka.utils
 
-import java.lang.Integer.max
+import kotlin.jvm.JvmName
+import kotlin.math.max
 
 /**
  * Minimum number of bytes to add to the buffer if capacity is reached when writing data o the buffer.
@@ -132,8 +133,8 @@ interface ReadIntBuffer : IntBuffer {
 
     /**
      * Returns a list of bytes, which is a copy of [n] bytes of the buffer starting at [position].
-     * * If there are less than [n] bytes left in the backing list returns a Result.Failure.
-     * * If [position] is already at  the end of the backing array, or if n is 0 or less, then an empty array is returned.
+     * If there are less than [n] bytes left in the backing list returns a Result.Failure.
+     * If [position] is already at the end of the backing array, or if n is 0 or less, then an empty array is returned.
      */
     fun readList(n: Int = 0): Result<List<Int>>
 
@@ -173,7 +174,7 @@ interface ReadIntBuffer : IntBuffer {
     fun peekByteArrayOrNull(n: Int = 0): ByteArray?
 
     /**
-     * Reads the remaining bytes. returns an empty list when no bytes are left to read.
+     * Reads the remaining bytes. Returns an empty list when no bytes are left to read.
      */
     fun readRemaining(): Result<List<Int>>
 
@@ -278,7 +279,7 @@ interface WriteIntBuffer : IntBuffer {
     fun write(list: List<Int>)
 
     /**
-     * Current size of the backing buffer, i.e. the total number of bytes that can be written without triggering an
+     * Current size of the backing buffer, i.e., the total number of bytes that can be written without triggering an
      * extension (and copy) of the backing buffer
      */
     val capacity: Int
@@ -291,7 +292,7 @@ interface WriteIntBuffer : IntBuffer {
 
     /**
      * Create a [ReadIntBuffer] from this [WriteIntBuffer]. The [position] will be 0, and the
-     * [ReadIntBuffer.watermark] is the position before calling this function.  Effectively allows reading the data that was
+     * [ReadIntBuffer.watermark] is the position before calling this function.  Effectively allows reading the data
      * written to the buffer.
      */
     fun toReadListOfIntBuffer(): ReadIntBuffer
@@ -320,6 +321,18 @@ interface IntBuffer {
             require(buf.all { it in Byte.MIN_VALUE..Byte.MAX_VALUE })
             require(n in 0..buf.size)
             return IntBufferImpl(buf.size, buf.toMutableList(), n)
+        }
+
+        /**
+         * Wrap a [ByteArray] into a [ReadIntBuffer], ready for reading at [position] 0
+         *
+         * @param n The number of bytes that are actually populated in [buf]. Must be positive and not bigger than the size of [buf].
+         *
+         */
+//        @JvmName("wrapListOfBytes")
+        fun wrap(buf: ByteArray, n: Int = buf.size): ReadIntBuffer {
+            require(n in 0..buf.size)
+            return IntBufferImpl(buf.size, buf.map { b -> b.toInt() }.toMutableList(), n)
         }
 
         /**
@@ -594,7 +607,7 @@ class IntBufferImpl internal constructor(
         write(list)
     }
 
-    override fun readString(n: Int): Result<String> = readList(n).mapCatching { it.toByteArray().toString(Charsets.UTF_8) }
+    override fun readString(n: Int): Result<String> = readList(n).mapCatching { it.toByteArray().decodeToString() }
 
     override fun readStringOrNull(n: Int): String? = readString(n).getOrNull()
 
@@ -730,7 +743,7 @@ class IntBufferImpl internal constructor(
     }
 
     /**
-     * Hash code based on populated part of backing list, i.e. the first [position] bytes
+     * Hash code based on populated part of backing list, i.e., the first [position] bytes
      */
     override fun hashCode(): Int = buffer.take(max(position, watermark)).fold(1) { acc, element ->
         acc * 31 + element
@@ -749,9 +762,7 @@ class IntBufferImpl internal constructor(
         if (position != other.position) return false
         if (watermark != other.watermark) return false
         val bytesToCompare = max(position, watermark)
-        if (buffer.take(bytesToCompare) != other.buffer.take(bytesToCompare)) return false
-
-        return true
+        return buffer.take(bytesToCompare) == other.buffer.take(bytesToCompare)
     }
 }
 

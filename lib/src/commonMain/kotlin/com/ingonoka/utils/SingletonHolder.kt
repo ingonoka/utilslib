@@ -73,13 +73,13 @@ open class SingletonHolder<out T, in A>(creator: (A) -> T) {
     }
 
     /**
-     * Return the singleton and initialize it when it hasn't  been instantiated yet
+     * Return the singleton and initialize it when it hasn't been instantiated yet
      */
     suspend fun instance(arg: A): T = instance ?: initialize(arg)
 
 
     /**
-     * Return a the singleton without the need for suspend function
+     * Return the singleton without the need for suspend function
      *
      * @throws IllegalStateException if the Singleton hasn't been initialized yet
      */

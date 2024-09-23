@@ -7,24 +7,29 @@
  *
  */
 
-
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.mavenPublish)
     alias(libs.plugins.dokkaGradlePlugin)
 }
 
 android {
-    namespace = "com.ingonoka.utils"
+
+//    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//    sourceSets["main"].res.srcDirs("src/androidMain/res")
+//    sourceSets["main"].resources.srcDirs("src/androidMain/resources")
+//    sourceSets["main"].java.srcDirs("src/androidMain/java")
+
+    namespace = "${rootProject.group}.${rootProject.name}"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-    version = project.version
+    version = rootProject.version
 
     compileOptions {
-        targetCompatibility = JavaVersion.VERSION_21
-        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.valueOf(libs.versions.android.target.compatibility.get())
+        sourceCompatibility = JavaVersion.valueOf(libs.versions.android.source.compatibility.get())
     }
 
     defaultConfig {
@@ -43,16 +48,12 @@ android {
     }
 }
 
-dependencies {
-    implementation(libs.junit.jupiter)
-}
-
 kotlin {
 
     jvm().compilations.all {
         compileTaskProvider.configure{
             compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_21)
+                jvmTarget.set(JvmTarget.valueOf(libs.versions.jvm.target.get()))
             }
         }
     }
@@ -61,45 +62,64 @@ kotlin {
 
     androidTarget {
         publishLibraryVariants("release", "debug")
-    }.compilations.all {
-        compileTaskProvider.configure{
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_21)
+
+        compilations.all {
+            compileTaskProvider.configure{
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.valueOf(libs.versions.jvm.target.get()))
+                }
             }
         }
     }
 
     sourceSets {
+
+        commonMain {
+            dependencies{
+                implementation(libs.kotlin.coroutines)
+                implementation(libs.kotlinx.datetime)
+            }
+        }
+
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
+                implementation(libs.kotlin.coroutines.test)
+                implementation(libs.ingonoka.hexutils)
             }
         }
-        jvmTest {
+
+        jvmMain {
+            dependencies {
+                implementation(libs.jvm.logback.classic)
+            }
         }
-        androidUnitTest {
+
+        androidMain {
+            dependencies {
+                implementation(libs.android.logback)
+            }
         }
     }
 }
 
-val pomDeveloper = "Ingo Noka"
-val pomLicenseName = "Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"
-val pomLicenseUrl = "https://creativecommons.org/licenses/by-nc-nd/4.0/"
-
 publishing {
     publications.withType<MavenPublication>().configureEach {
         pom {
-            name = "UTILS Library"
-            description = "A library with misc helper functions."
+            // Properties from the root project gradle.properties
+            name = providers.gradleProperty("com.ingonoka.pomName").get()
+            description = providers.gradleProperty("com.ingonoka.pomDescription").get()
             licenses {
                 license {
-                    name = pomLicenseName
-                    url = pomLicenseUrl
+                    // Properties from the ~/.gradle/gradle.properties
+                    name = providers.gradleProperty("com.ingonoka.pomLicenseName").get()
+                    url = providers.gradleProperty("com.ingonoka.pomLicenseUrl").get()
                 }
             }
             developers {
                 developer {
-                    name = pomDeveloper
+                    // Properties from the ~/.gradle/gradle.properties
+                    name = providers.gradleProperty("com.ingonoka.pomDeveloper")
                 }
             }
         }
@@ -108,7 +128,8 @@ publishing {
 
 tasks.dokkaHtml.configure {
     outputDirectory.set(layout.buildDirectory.get().dir("dokka"))
-    moduleName.set("hexutils")
+    // Properties from the root project gradle.properties
+    moduleName.set(rootProject.name)
 
     dokkaSourceSets {
         named("jvmMain") {
@@ -131,4 +152,5 @@ tasks.dokkaHtml.configure {
 repositories {
     mavenCentral()
     google()
+    mavenLocal()
 }
