@@ -39,16 +39,16 @@ Manager.initialize(context) // returns the singleton
 Manager.instance(context) // returns the singleton
 ```
 
-Retrieve singleton without parameter
+Retrieve singleton without a parameter
 ```kotlin
 Manager.instance() // throws an exception if niot initialised at lest once with the parameter
-Manager.instance(context) // parameter will be ignored if initialised already
+Manager.instance(context) // parameter will be ignored if initialzed already
 ```
 
 
 ## Base64
 
-Convert from Base64 string to byte array
+Convert from Base64 string to byte-array
 ```kotlin
 "Zg==".decodeFromBase64() // [ 102 ]
 ```
@@ -62,7 +62,7 @@ byteArrayOf(102).toBase64() // "Zg=="
 
 The functions in this class convert numbers to and from byte arrays that do not use leading
 zero bytes to indicate positive numbers.  For example `0x80` is converted to 128 and 
-not to -127.  Likewise an Integer 128 is converted to `0x80` and not to `0x00000080`.
+not to -127.  Likewise, an Integer 128 is converted to `0x80` and not to `0x00000080`.
 
 ```kotlin
 assertEquals(128L, byteArrayOf(0x80.toByte()).toLongNoLeadingZeros())
