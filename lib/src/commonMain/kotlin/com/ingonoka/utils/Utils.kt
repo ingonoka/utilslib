@@ -9,39 +9,9 @@
 
 package com.ingonoka.utils
 
-/**
- * Convert [String] into a [ByteArray] of UTF8 characters.
- */
-expect fun String.toByteArray(): ByteArray
 
 /**
- * Convert [String] into a [CharArray]
- */
-expect fun String.toCharacterArray(): CharArray
-
-/**
- * Compare two lists.
- *
- * - Lists are equal if both are null
- * - Lists are equal if they both have the same number of elements and each element of list 1 is contained in list 2
- * regardless of position
- */
-fun <T> compareLists(a: List<T>?, b: List<T>?): Boolean {
-    if (a == null && b == null) return true
-
-    if (a == null || b == null) return false
-
-    val aSet = a.toSet()
-    val bSet = b.toSet()
-
-    if (aSet.size != bSet.size) return false
-
-    return aSet.all { t: T -> bSet.contains(t) }
-
-}
-
-/**
- * Helper function to build byte array using a [PoorMansByteBuffer].
+ * Helper function to build bytearray using an [WriteIntBuffer].
  *
  * Usage:
  * ```
@@ -51,15 +21,15 @@ fun <T> compareLists(a: List<T>?, b: List<T>?): Boolean {
  * }.materialize { throw it }
  * ```
  */
-fun buildByteArray(builder: PoorMansByteBuffer.() -> Unit): SingleResult<ByteArray> =
+fun buildByteArray(builder: WriteIntBuffer.() -> Unit): Result<ByteArray> =
     try {
-        SingleResult.success(
-            PoorMansByteBuffer().apply {
+        Result.success(
+            IntBuffer.empty().apply {
                 builder()
-            }.toByteArray()
+            }.toReadListOfIntBuffer().readByteArray().getOrThrow()
         )
     } catch (e: Exception) {
-        SingleResult.failure(Exception("Building byte array failed", e))
+        Result.failure(Exception("Building byte array failed", e))
     }
 
 /**

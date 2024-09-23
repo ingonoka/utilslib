@@ -6,7 +6,13 @@
  * Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
  *
  */
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
 
-package com.ingonoka.utils
-
-expect fun String.format(vararg args: Any?): String
+rootProject.name = "utilslib"
+include(":lib")

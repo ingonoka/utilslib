@@ -171,14 +171,14 @@ fun ByteArray.toInt(index: Int = 0): Result<Int> =
 /**
  * Use [numBytes] bytes of the [ByteArray] and interpret as  [Long] without leading zeros. Start reading at [index]
  *
- * * A failure result will be returned if:
+ * * A failure result is returned if:
  *
  * - [numBytes] is larger than 8
  * - [numBytes] is zero
  * - [numBytes] is larger than the remaining bytes in the packet
  *
  * If [numBytes] is not provided it will be set to the number of remaining bytes in the packet
- * An empty array yields 0L.
+ * An empty array yields `0L`.
  *
  * For example `0x0080` and `0x80` are both converted to 128 and NOT to 128 and -127 respectively
  *
@@ -190,15 +190,15 @@ fun ByteArray.toInt(index: Int = 0): Result<Int> =
  */
 fun ByteArray.toLongNoLeadingZeros(numBytes: Int = 0, index: Int = 0): Result<Long> = try {
 
-    if (numBytes !in 0..8) throw Exception("numBytes must be between 0 and 8. Is: $numBytes")
+    if (numBytes !in 0..8) throw IllegalArgumentException("numBytes must be between 0 and 8. Is: $numBytes")
 
-    if (isEmpty()) throw Exception("ByteArray Empty. Cannot read Int")
+    if (isEmpty()) throw IllegalArgumentException("ByteArray Empty. Cannot read Int")
 
-    if (index !in indices) throw Exception("index must be between 0 and $size. Is: $index")
+    if (index !in indices) throw IllegalArgumentException("index must be between 0 and $size. Is: $index")
 
     val length = if (numBytes == 0) min(8, size - index) else numBytes
 
-    if (index + numBytes > size) throw Exception("Not enough bytes in array for index $index and numBytes ${length}. Need ${numBytes}, have ${size - index}")
+    if (index + numBytes > size) throw IllegalArgumentException("Not enough bytes in array for index $index and numBytes ${length}. Need ${numBytes}, have ${size - index}")
 
     val l = when (length) {
 
@@ -353,7 +353,7 @@ fun ByteArray.toLong(index: Int = 0): Result<Long> =
 /**
  * Read [n] bytes from the packet and interpret them as [Long] without leading zeros.
  *
- * A failure result will be returned if:
+ * A failure result is returned if:
  *
  * - [n] is larger than 8
  * - [n] is zero
@@ -363,9 +363,10 @@ fun ByteArray.toLong(index: Int = 0): Result<Long> =
  *
  * @see ByteArray.toLongNoLeadingZeros
  */
-fun PoorMansByteBuffer.readLongNoLeadingZeros(n: Int = -1): Result<Long> = try {
+fun ReadIntBuffer.readLongNoLeadingZeros(n: Int = -1): Result<Long> = try {
 
-    val remaining = size - pos
+    val remaining = this.bytesLeftToRead()
+
     val bytesToRead = if (n == -1) remaining else min(n, remaining)
 
     val buf = readByteArray(bytesToRead).getOrThrow()
@@ -382,7 +383,7 @@ fun PoorMansByteBuffer.readLongNoLeadingZeros(n: Int = -1): Result<Long> = try {
  *
  *
  */
-fun PoorMansByteBuffer.readIntNoLeadingZeros(n: Int): Result<Int> = readLongNoLeadingZeros(n).map { it.toInt() }
+fun ReadIntBuffer.readIntNoLeadingZeros(n: Int): Result<Int> = readLongNoLeadingZeros(n).map { it.toInt() }
 
 
 /**
@@ -459,7 +460,7 @@ fun ULong.toByteArrayWithoutLeadingZeros(): Result<UByteArray> = Result.success(
 
 /**
  * Convert a [Long] to a [ByteArray]. The resulting array only has as many bytes as are necessary to store all bits
- * without any leading zero bytes.  Negative [Long] input will always result in an array with 8 bytes.
+ * without any leading zero bytes.  Negative [Long] input will always result in an array with eight bytes.
  *
  * @see ULong.toByteArrayWithoutLeadingZeros
  */

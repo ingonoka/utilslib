@@ -1,6 +1,7 @@
 package com.ingonoka.utils
 
-/** Reverse order of all bits in a Byte.  The left most bit become the right most bit etc.
+/** Reverse order of all bits in a Byte.
+ * The left-most bit becomes the right most bit etc.
  *
  * ### Attribution
  * "Bit Twiddling Hacks", By Sean Eron Anderson [seander@cs.stanford.edu].
@@ -62,7 +63,7 @@ fun ByteArray.shiftLeft(shiftBitCount: Int): ByteArray {
  *
  * Each integer is treated like a byte by only ever touching the bits in the least significant byte of the integer
  *
- * [https://stackoverflow.com/a/47231300] by [https://stackoverflow.com/users/774398/for3st]]
+ * [https://stackoverflow.com/a/47231300] by [https://stackoverflow.com/users/774398/for3st]
  */
 
 fun MutableList<Int>.shiftLeft(shiftBitCount: Int): List<Int> {
@@ -89,7 +90,8 @@ fun MutableList<Int>.shiftLeft(shiftBitCount: Int): List<Int> {
     return this
 }
 
-/** Shift all bits in the ByteArray to the right by [shiftBitCount] bits. Sign is not carried.
+/** Shift all bits in the ByteArray to the right by [shiftBitCount] bits.
+ * The Sign is not carried.
  *
  * [https://stackoverflow.com/a/47231300] by [https://stackoverflow.com/users/774398/for3st]
  **/
@@ -120,7 +122,7 @@ fun ByteArray.shiftRight(shiftBitCount: Int): ByteArray {
 
 /**
  * Shift all bits in the least significant byte of each integer in the lst to the right by [shiftBitCount] bits.
- * Sign is not carried.
+ * The Sign is not carried.
  *
  * Bits dropping off of the right are lost
  *

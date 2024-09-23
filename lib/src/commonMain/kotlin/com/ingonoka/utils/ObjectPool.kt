@@ -13,10 +13,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.milliseconds
 
-expect fun currentTimeMillis(): Long
-
 /**
- * Pool of objects with expiry period and maximum capacity.
+ * Pool of objects with expiry-period and maximum capacity.
  *
  * Objects that haven't been checked out for more than [expirationTime] will be removed from the pool.
  *
@@ -43,7 +41,8 @@ abstract class ObjectPool<T>(val capacity: Int = 100, private val expirationTime
     protected abstract fun create(): T
 
     /** Called before the object is checked out from the pool.
-     * Return **`false`** if object is not valid anymore.  Invalid objects will be removed from the pool.
+     * Return **`false`** if the object is not valid anymore.
+     * Invalid objects will be removed from the pool.
      */
     abstract fun validate(o: T?): Boolean
 
@@ -54,7 +53,7 @@ abstract class ObjectPool<T>(val capacity: Int = 100, private val expirationTime
 
     /** Return an element from the pool of available elements.
      *
-     * @param required [(T)->Boolean] Function takes an element of the pool and returns true if the element meets
+     * @param required [(T)→Boolean] Function takes an element of the pool and returns true if the element meets
      * certain specifications
      */
     fun checkOut(required: (T) -> Boolean): T? {

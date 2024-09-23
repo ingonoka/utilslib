@@ -19,14 +19,12 @@ fun List<Int>.luhnCheckSum() =
                 num + num
             else
                 num
-        }
-        .map {
+        }.sumOf {
             if (it > 9)
                 it - 9
             else
                 it
-        }
-        .sum() * 9 % 10
+        } * 9 % 10
 
 /**
  * Calculate the Luhn check digit for a decimal [Long]

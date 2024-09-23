@@ -140,17 +140,12 @@ val indicesTwo = intArrayOf(
 )
 
 /**
- * Convert a string of UTF-8 characters into Base64
- */
-fun String.toBase64() = toUtf8().toBase64().decodeToString()
-
-/**
  * Convert an array of bytes into base64
  */
 
 fun ByteArray.toBase64(): ByteArray {
 
-    if (size == 0) return byteArrayOf()
+    if (isEmpty()) return byteArrayOf()
 
     val resultSize = ((size + 2) / 3) * 4
 
@@ -197,15 +192,15 @@ fun ByteArray.toBase64(): ByteArray {
 }
 
 /**
- * Convert a string of bytes available from a [PoorMansByteBuffer] into base64
+ * Convert a string of bytes available from a [ReadIntBuffer] into base64
  */
-fun PoorMansByteBuffer.toBase64(): ByteArray = toByteArray().toBase64()
+fun ReadIntBuffer.toBase64(): ByteArray = readRemaining().getOrThrow().toByteArray().toBase64()
 
 fun String.fromBase64(): ByteArray {
 
     require(length % 4 == 0)
 
-    if (length == 0) return byteArrayOf()
+    if (isEmpty()) return byteArrayOf()
 
     var resultSize = (length / 4) * 3
 
@@ -255,7 +250,7 @@ fun ByteArray.fromBase64(): ByteArray {
 
     require(size % 4 == 0)
 
-    if (size == 0) return byteArrayOf()
+    if (isEmpty()) return byteArrayOf()
 
     var resultSize = (size / 4) * 3
 
@@ -299,9 +294,9 @@ fun ByteArray.fromBase64(): ByteArray {
 
 
 /**
- * Convert Base64 characters from a [PoorMansByteBuffer] into the original bytes
+ * Convert Base64 characters from a [ReadIntBuffer] into the original bytes
  */
-fun PoorMansByteBuffer.fromBase64(): ByteArray = toByteArray().fromBase64()
+fun ReadIntBuffer.fromBase64(): ByteArray = readRemaining().getOrThrow().toByteArray().fromBase64()
 
 fun Char.isBase64(): Boolean = (alphabet.find { it.toInt().toChar() == this } != null) || this == '='
 
