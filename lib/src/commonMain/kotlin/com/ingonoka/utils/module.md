@@ -25,7 +25,7 @@ Make a class a singleton
 ```kotlin
 class Manager private constructor(context: Context) {
    init {
-     // Init using context argument, but do not store a reference to context!
+     context.toString()
    }
 
    companion object : SingletonHolder<Manager, Context>(::Manager)
@@ -60,7 +60,7 @@ byteArrayOf(102).toBase64() // "Zg=="
 
 ## Minimum byte array number conversion
 
-The functions in this class convert numbers to and from byte arrays that dop not use leading
+The functions in this class convert numbers to and from byte arrays that do not use leading
 zero bytes to indicate positive numbers.  For example `0x80` is converted to 128 and 
 not to -127.  Likewise an Integer 128 is converted to `0x80` and not to `0x00000080`.
 
@@ -72,7 +72,7 @@ assertEquals(128, byteArrayOf(0x80.toByte()).toIntNoLeadingZeros())
 assertEquals(128, ByteReadPacket(byteArrayOf(0x80.toByte())).readIntNoLeadingZeros(1))
 
 assertTrue(128.toByteArrayWithoutLeadingZeros().contentEquals(byteArrayOf(0x80.toByte())))
-assertTrue(128u.toByteArrayWithoutLeadingZeros().contentEquals(ubyteArrayOf(0x80.toUByte())))
+assertTrue(128u.toByteArrayWithoutLeadingZeros().contentEquals(uByteArrayOf(0x80.toUByte())))
 assertTrue(128L.toByteArrayWithoutLeadingZeros().contentEquals(byteArrayOf(0x80.toByte())))
 assertTrue(128uL.toByteArrayWithoutLeadingZeros().contentEquals(byteArrayOf(0x80.toByte())))
 

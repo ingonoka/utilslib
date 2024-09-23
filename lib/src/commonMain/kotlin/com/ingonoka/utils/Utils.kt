@@ -21,12 +21,12 @@ package com.ingonoka.utils
  * }.materialize { throw it }
  * ```
  */
-fun buildByteArray(builder: WriteIntBuffer.() -> Unit): Result<ByteArray> =
+fun buildByteArray(builder: WriteIntBuffer.() -> Unit): Result<List<Int>> =
     try {
         Result.success(
             IntBuffer.empty().apply {
                 builder()
-            }.toReadListOfIntBuffer().readByteArray().getOrThrow()
+            }.toReadListOfIntBuffer().readRemaining().getOrThrow()
         )
     } catch (e: Exception) {
         Result.failure(Exception("Building byte array failed", e))
