@@ -78,7 +78,25 @@ class UtilsTest {
 
 }
 
-sealed class TestSealedClass
-class TestSealedClass1 : TestSealedClass()
-class TestSealedClass2 : TestSealedClass()
+sealed class TestSealedClass(val state: Int) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TestSealedClass) return false
+
+        if (state != other.state) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return state
+    }
+
+    override fun toString(): String {
+        return "TestSealedClass(state=$state)"
+    }
+}
+class TestSealedClass1 : TestSealedClass(1)
+class TestSealedClass2 : TestSealedClass(2)
 class SomeOtherClass

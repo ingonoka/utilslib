@@ -192,7 +192,6 @@ class IntBufferTest {
         }
 
         byteBuffer.reset()
-        @Suppress("SpellCheckingInspection")
         byteBuffer.write("FFFF".hexToBytes())
 
         byteBuffer.toReadListOfIntBuffer().apply {
@@ -272,7 +271,6 @@ class IntBufferTest {
         }
 
         byteBuffer.reset()
-        @Suppress("SpellCheckingInspection")
         byteBuffer.write("FFFFFFFF".hexToBytes())
         byteBuffer.toReadListOfIntBuffer().apply {
             assertEquals(-1, readInt().getOrThrow())
@@ -421,7 +419,6 @@ class IntBufferTest {
         }
 
         byteBuffer.reset()
-        @Suppress("SpellCheckingInspection")
         byteBuffer.write("FFFFFFFFFFFFFFFF".hexToBytes())
         byteBuffer.toReadListOfIntBuffer().apply {
             assertEquals(-1L, readLong().getOrThrow())

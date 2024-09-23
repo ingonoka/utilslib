@@ -11,7 +11,6 @@ package com.ingonoka.utils
 
 import kotlin.test.Test
 import kotlin.test.assertFails
-import kotlin.test.assertTrue
 
 class TestHelpersTest {
 
@@ -24,7 +23,7 @@ class TestHelpersTest {
 
         assertArrayNotEquals(intArrayOf(1, 2, 3).toTypedArray(), intArrayOf(1, 2, 4).toTypedArray())
 
-        assertFails {  assertArrayNotEquals(intArrayOf(1, 2, 3).toTypedArray(), intArrayOf(1, 2, 3).toTypedArray()) }
+        assertFails { assertArrayNotEquals(intArrayOf(1, 2, 3).toTypedArray(), intArrayOf(1, 2, 3).toTypedArray()) }
 
     }
 }

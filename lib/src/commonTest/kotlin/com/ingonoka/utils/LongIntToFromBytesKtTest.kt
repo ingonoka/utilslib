@@ -7,8 +7,6 @@
  *
  */
 
-@file:Suppress("SpellCheckingInspection")
-
 package com.ingonoka.utils
 
 import com.ingonoka.hexutils.hexToBytes

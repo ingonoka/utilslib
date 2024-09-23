@@ -34,7 +34,7 @@ class ChunkedTest {
     @Test
     fun testChunked() = runTest {
 
-        var res = flow<Int> {
+        var res = flow {
             emit(1)
             emit(2)
             emit(3)
@@ -46,7 +46,7 @@ class ChunkedTest {
         assertEquals(listOf(1, 2, 3), res[0])
         assertEquals(listOf(4), res[1])
 
-        res = flow<Int> {
+        res = flow {
             emit(1)
             emit(2)
             emit(3)
@@ -57,7 +57,7 @@ class ChunkedTest {
         assertEquals(listOf(1, 2, 3, 4), res[0])
 
 
-        res = flow<Int> {
+        res = flow {
             delay(4.seconds)
             emit(1)
             emit(2)
@@ -68,7 +68,7 @@ class ChunkedTest {
         assertEquals(1, res.size)
         assertEquals(listOf(1, 2, 3, 4), res[0])
 
-        res = flow<Int> {
+        res = flow {
             delay(4.seconds)
             emit(1)
             emit(2)
@@ -170,12 +170,13 @@ class ChunkedTest {
     @Test
     fun chunkedWithSahredFlow1() = runBlocking {
 
-        val _sharedFlow = MutableSharedFlow<Int>(128)
-        val sharedFlow = _sharedFlow.asSharedFlow()
-        repeat(5) { i -> _sharedFlow.emit(i) }
+        val sharedFlow1 = MutableSharedFlow<Int>(128)
+        val sharedFlow2 = sharedFlow1.asSharedFlow()
+
+        repeat(5) { i -> sharedFlow1.emit(i) }
 
         val res = buildList {
-            sharedFlow.chunked(1.seconds, 1, true).take(5).collect {
+            sharedFlow2.chunked(1.seconds, 1, true).take(5).collect {
                 add(it)
             }
         }
@@ -186,9 +187,9 @@ class ChunkedTest {
     @Test
     fun chunkedWithSharedFlow1() = runBlocking {
 
-        val _sharedFlow = MutableSharedFlow<Int>(128)
-        val sharedFlow = _sharedFlow.asSharedFlow()
-        _sharedFlow.emit(0)
+        val sharedFlow1 = MutableSharedFlow<Int>(128)
+        val sharedFlow = sharedFlow1.asSharedFlow()
+        sharedFlow1.emit(0)
 
         val res = buildList {
             sharedFlow.chunked(5.seconds, 1, true).take(1).collect {
@@ -201,9 +202,9 @@ class ChunkedTest {
 
     @Test
     fun testInterval() = runBlocking {
-        val _sharedFlow = MutableSharedFlow<Int>(128)
-        val sharedFlow = _sharedFlow.asSharedFlow()
-        _sharedFlow.emit(0)
+        val sharedFlow1 = MutableSharedFlow<Int>(128)
+        val sharedFlow = sharedFlow1.asSharedFlow()
+        sharedFlow1.emit(0)
 
         val res = sharedFlow.withTimeout(5.seconds).take(1).first()
 
@@ -212,8 +213,8 @@ class ChunkedTest {
 
     @Test
     fun testInterval1() = runBlocking {
-        val _sharedFlow = MutableSharedFlow<Int>(128)
-        val sharedFlow = _sharedFlow.asSharedFlow()
+        val sharedFlow1 = MutableSharedFlow<Int>(128)
+        val sharedFlow = sharedFlow1.asSharedFlow()
 
         val res = sharedFlow.withTimeout(5.seconds).take(1).first()
 
