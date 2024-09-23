@@ -9,41 +9,21 @@
 
 package com.ingonoka.utils
 
-import kotlinx.datetime.*
-import kotlinx.datetime.format.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
+import kotlinx.datetime.offsetIn
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 
 class DateFunctionsTest {
 
-    fun formatTime(instant: Instant): String {
-        val dateFormat = DateTimeComponents.Format {
-            year()
-            char('-')
-            monthNumber()
-            char('-')
-            dayOfMonth()
-            char('T')
-            hour()
-            char(':')
-            minute()
-            char(':')
-            second()
-            offsetHours(Padding.ZERO)
-            char(':')
-            offsetMinutesOfHour(Padding.ZERO)
-        }
-
-        println(TimeZone.availableZoneIds)
-        return instant.format(dateFormat, instant.offsetIn(TimeZone.of("+00:00")))
-
-    }
-
     @Test
     fun testInstantToString() {
-
 
         assertEquals(
             "1970-01-01T00:00:00+00:00",
@@ -68,7 +48,6 @@ class DateFunctionsTest {
         assertEquals(0L, "1970-01-01T00:00:00+00:00".scanTime().epochSeconds)
         assertFailsWith<IllegalArgumentException> { "1970-01-01T00:00:00Z".scanTime().epochSeconds }
         assertEquals(1594721868L, "2020-07-14T10:17:48+00:00".scanTime().epochSeconds)
-
 
     }
 }

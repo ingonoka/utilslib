@@ -16,6 +16,19 @@ class UtilsTest {
 
 
     @Test
+    fun testBuildByteArray() {
+
+        val expected = listOf(0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2)
+        assertArrayEquals(
+            expected.toTypedArray(),
+            buildByteArray {
+                this.write(1)
+                this.write(2L)
+            }.getOrThrow().toTypedArray()
+        )
+    }
+
+    @Test
     fun testCompareLists() {
 
         assertTrue(listOf<Int>().containsAll(listOf()))
@@ -31,12 +44,14 @@ class UtilsTest {
     fun combineMessages() {
         val ex = Exception("First Message", Exception("Second Message", Exception("Third Message")))
 
-        assertEquals("First MessageSecond MessageThird Message",ex.combineAllMessages("") )
-        assertEquals("First Message => Second Message => Third Message",ex.combineAllMessages(" => ") )
-        assertEquals("""
+        assertEquals("First MessageSecond MessageThird Message", ex.combineAllMessages(""))
+        assertEquals("First Message => Second Message => Third Message", ex.combineAllMessages(" => "))
+        assertEquals(
+            """
             |First Message
             |Second Message
-            |Third Message""".trimMargin(),ex.combineAllMessages("\n") )
+            |Third Message""".trimMargin(), ex.combineAllMessages("\n")
+        )
     }
 
     @Test
@@ -55,14 +70,15 @@ class UtilsTest {
 
     }
 
-    private fun getTestSealedClass(option: Int): TestSealedClass? = when(option) {
-            1 -> TestSealedClass1()
-            2 -> TestSealedClass2()
-            else -> null
-        }
+    private fun getTestSealedClass(option: Int): TestSealedClass? = when (option) {
+        1 -> TestSealedClass1()
+        2 -> TestSealedClass2()
+        else -> null
+    }
+
 }
 
-sealed class TestSealedClass()
-class TestSealedClass1: TestSealedClass()
-class TestSealedClass2: TestSealedClass()
+sealed class TestSealedClass
+class TestSealedClass1 : TestSealedClass()
+class TestSealedClass2 : TestSealedClass()
 class SomeOtherClass

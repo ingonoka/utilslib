@@ -9,7 +9,6 @@
 
 package com.ingonoka.utils
 
-import kotlin.jvm.JvmName
 import kotlin.math.max
 
 /**
@@ -48,7 +47,7 @@ interface ReadIntBuffer : IntBuffer {
      * Same as peekByte, but return a null instead of failure [Result]
      */
     fun peekByteOrNull(): Int?
-    
+
     /**
      * Read [n] bytes from the buffer and convert to a [Long] with [byteOrder]
      * ```
@@ -78,10 +77,12 @@ interface ReadIntBuffer : IntBuffer {
      *
      */
     fun peekLong(n: Int = 8, byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): Result<Long>
+
     /**
      * Read [Long], but do not advance position. Return null instead of failure [Result]
      *
-     */fun peekLongOrNull(n: Int = 8, byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): Long?
+     */
+    fun peekLongOrNull(n: Int = 8, byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): Long?
 
     /**
      * Read [n] bytes from the buffer and convert to a [Int] with [byteOrder]
@@ -148,6 +149,7 @@ interface ReadIntBuffer : IntBuffer {
      *
      */
     fun peekList(n: Int = 0): Result<List<Int>>
+
     /**
      * Same as [peekList], but return null instead of throwing exceptions
      */
@@ -168,6 +170,7 @@ interface ReadIntBuffer : IntBuffer {
      *
      */
     fun peekByteArray(n: Int = 0): Result<ByteArray>
+
     /**
      * Same as [peekByteArray], but return null instead of throwing exceptions
      */
@@ -188,6 +191,7 @@ interface ReadIntBuffer : IntBuffer {
      *
      */
     fun peekRemaining(): Result<List<Int>>
+
     /**
      * Same as [peekRemaining], but return null instead of throwing exceptions
      */
@@ -389,7 +393,7 @@ class IntBufferImpl internal constructor(
 
     override val capacity
         get() = buffer.size
-    
+
     override fun writeByte(b: Int) {
         require(b in Byte.MIN_VALUE.toInt()..Byte.MAX_VALUE.toInt())
         if (position + 1 > buffer.size) extend(position + MIN_EXTEND_SIZE)
@@ -418,7 +422,7 @@ class IntBufferImpl internal constructor(
         position = pos
         return b
     }
-    
+
     override fun write(l: Long, n: Int, byteOrder: ByteOrder) {
 
         when (n) {
@@ -528,9 +532,9 @@ class IntBufferImpl internal constructor(
         val pos = position
         val l = readLongOrNull()
         position = pos
-        return l    
+        return l
     }
-    
+
     override fun write(i: Int, n: Int, byteOrder: ByteOrder) {
 
         when (n) {
@@ -601,7 +605,7 @@ class IntBufferImpl internal constructor(
         position = pos
         return l
     }
-    
+
     override fun write(str: String) {
         val list = str.encodeToByteArray().toListOfInt()
         write(list)
@@ -624,7 +628,7 @@ class IntBufferImpl internal constructor(
         position = pos
         return s
     }
-    
+
     override fun write(arr: ByteArray) = write(arr.toListOfInt())
 
     override fun readByteArray(n: Int): Result<ByteArray> = readList(n).mapCatching { it.toByteArray() }
@@ -644,7 +648,7 @@ class IntBufferImpl internal constructor(
         position = pos
         return ba
     }
-    
+
     override fun write(list: List<Int>) {
         if (position + list.size > buffer.size) extend(position + max(list.size, MIN_EXTEND_SIZE))
         list.copyInto(
@@ -685,7 +689,7 @@ class IntBufferImpl internal constructor(
         position = pos
         return l
     }
-    
+
     override fun readRemaining(): Result<List<Int>> {
         val list = if (bytesLeftToRead() == 0) {
             listOf()
