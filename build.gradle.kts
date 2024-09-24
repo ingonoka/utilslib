@@ -8,22 +8,149 @@
  */
 
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.ByteArrayOutputStream
 
 plugins {
-    //trick: for the same plugin versions in all submodules
-    alias(libs.plugins.androidLibrary).apply(false)
-    alias(libs.plugins.kotlinMultiplatform).apply(false)
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.mavenPublish)
+    alias(libs.plugins.dokkaGradlePlugin)
     alias(libs.plugins.asciiDocGradlePlugin)
 }
 
 repositories {
-    google()
     mavenCentral()
+    google()
+    mavenLocal()
 }
 
 project.group = "com.ingonoka"
 project.version = getVersionName()
+
+android {
+
+    namespace = "${project.group}.${project.name}"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    version = rootProject.version
+
+    compileOptions {
+        targetCompatibility = JavaVersion.valueOf(libs.versions.android.target.compatibility.get())
+        sourceCompatibility = JavaVersion.valueOf(libs.versions.android.source.compatibility.get())
+    }
+
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-android-optimize.txt")
+            testProguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-android-optimize.txt")
+        }
+        debug {
+            isMinifyEnabled = false
+        }
+    }
+}
+
+kotlin {
+
+    jvm().compilations.all {
+        compileTaskProvider.configure{
+            compilerOptions {
+                jvmTarget.set(JvmTarget.valueOf(libs.versions.jvm.target.get()))
+            }
+        }
+    }
+
+    macosX64()
+
+    androidTarget {
+        publishLibraryVariants("release", "debug")
+
+        compilations.all {
+            compileTaskProvider.configure{
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.valueOf(libs.versions.jvm.target.get()))
+                }
+            }
+        }
+    }
+
+    sourceSets {
+
+        commonMain {
+            dependencies{
+                implementation(libs.kotlin.coroutines)
+                implementation(libs.kotlinx.datetime)
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotlin.coroutines.test)
+                implementation(libs.ingonoka.hexutils)
+            }
+        }
+
+        jvmMain {
+        }
+
+        androidMain {
+        }
+    }
+}
+
+publishing {
+
+    publications.withType<MavenPublication>().forEach { p ->
+
+        p.pom {
+            // Properties from the root project gradle.properties
+            name = providers.gradleProperty("com.ingonoka.pomName").get()
+            description = providers.gradleProperty("com.ingonoka.pomDescription").get()
+            licenses {
+                license {
+                    // Properties from the ~/.gradle/gradle.properties
+                    name = providers.gradleProperty("com.ingonoka.pomLicenseName").get()
+                    url = providers.gradleProperty("com.ingonoka.pomLicenseUrl").get()
+                }
+            }
+            developers {
+                developer {
+                    // Properties from the ~/.gradle/gradle.properties
+                    name = providers.gradleProperty("com.ingonoka.pomDeveloper")
+                }
+            }
+        }
+    }
+}
+
+tasks.dokkaHtml.configure {
+    outputDirectory.set(layout.buildDirectory.get().dir("dokka"))
+    // Properties from the root project gradle.properties
+    moduleName.set(rootProject.name)
+
+    dokkaSourceSets {
+        named("jvmMain") {
+            displayName = "JVM"
+            platform.set(org.jetbrains.dokka.Platform.jvm)
+        }
+
+        named("androidMain") {
+            displayName = "Android"
+        }
+
+        named("commonMain") {
+            platform.set(org.jetbrains.dokka.Platform.common)
+            displayName = "Common"
+        }
+
+    }
+}
 
 /**
  * Get a version name of the form "v0.3-8-g9518e52", which is the tag

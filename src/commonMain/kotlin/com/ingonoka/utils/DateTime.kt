@@ -51,6 +51,13 @@ private val dateFormat = DateTimeComponents.Format {
 fun Instant.formatTime(timeZone: TimeZone): String = format(dateFormat, offsetIn(timeZone))
 
 /**
+ * Format seconds from Unix epoch as String in [timeZone]
+ *
+ * @see Instant.formatTime
+ */
+fun Long.formatTime(timeZone: TimeZone): String = Instant.fromEpochSeconds(this).formatTime(timeZone)
+
+/**
  * Scan String and convert to [Instant]. This ensures the canonical format as described in [Instant.formatTime]
  *
  * The string must be formatted the same way it would be printed with [Instant.formatTime]

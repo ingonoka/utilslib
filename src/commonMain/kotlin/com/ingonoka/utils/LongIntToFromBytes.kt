@@ -387,88 +387,88 @@ fun ReadIntBuffer.readIntNoLeadingZeros(n: Int): Result<Int> = readLongNoLeading
 
 
 /**
- * Convert a [ULong] to a [UByteArray]. The resulting array only has as many bytes as are necessary to store all bits
- * without any leading zero bytes.
+ * Convert a ULong to a list of int.
+ * The resulting array only has as many bytes as are necessary to store all bits without any leading zero bytes.
  */
-@Suppress("DuplicatedCode")
-@ExperimentalUnsignedTypes
-fun ULong.toByteArrayWithoutLeadingZeros(): Result<UByteArray> = Result.success(
-    when {
-
-        this < 256u -> ubyteArrayOf(
-            (this and 255u).toUByte()
-        )
-
-        this < 65536u -> ubyteArrayOf(
-            ((this shr 8) and 255u).toUByte(),
-            (this and 255u).toUByte()
-
-        )
-
-        this < 16777216u -> ubyteArrayOf(
-            ((this shr 16) and 255u).toUByte(),
-            ((this shr 8) and 255u).toUByte(),
-            (this and 255u).toUByte()
-        )
-
-        this < 4294967296u -> ubyteArrayOf(
-            ((this shr 24) and 255u).toUByte(),
-            ((this shr 16) and 255u).toUByte(),
-            ((this shr 8) and 255u).toUByte(),
-            (this and 255u).toUByte()
-        )
-
-        this < 1099511627776u -> ubyteArrayOf(
-            ((this shr 32) and 255u).toUByte(),
-            ((this shr 24) and 255u).toUByte(),
-            ((this shr 16) and 255u).toUByte(),
-            ((this shr 8) and 255u).toUByte(),
-            (this and 255u).toUByte()
-        )
-
-        this < 281474976710656u -> ubyteArrayOf(
-            ((this shr 40) and 255u).toUByte(),
-            ((this shr 32) and 255u).toUByte(),
-            ((this shr 24) and 255u).toUByte(),
-            ((this shr 16) and 255u).toUByte(),
-            ((this shr 8) and 255u).toUByte(),
-            (this and 255u).toUByte()
-        )
-
-        this < 72057594037927936u -> ubyteArrayOf(
-            ((this shr 48) and 255u).toUByte(),
-            ((this shr 40) and 255u).toUByte(),
-            ((this shr 32) and 255u).toUByte(),
-            ((this shr 24) and 255u).toUByte(),
-            ((this shr 16) and 255u).toUByte(),
-            ((this shr 8) and 255u).toUByte(),
-            (this and 255u).toUByte()
-        )
-
-        else -> ubyteArrayOf(
-            ((this shr 56) and 255u).toUByte(),
-            ((this shr 48) and 255u).toUByte(),
-            ((this shr 40) and 255u).toUByte(),
-            ((this shr 32) and 255u).toUByte(),
-            ((this shr 24) and 255u).toUByte(),
-            ((this shr 16) and 255u).toUByte(),
-            ((this shr 8) and 255u).toUByte(),
-            (this and 255u).toUByte()
-        )
-    }
-)
+//private fun ULong.toByteArrayWithoutLeadingZeros(): Result<List<Int>> = Result.success(
+//    when {
+//
+//        this < 256u -> listOf(
+//            (this and 255u)
+//        )
+//
+//        this < 65536u -> listOf(
+//            ((this shr 8) and 255u),
+//            (this and 255u)
+//
+//        )
+//
+//        this < 16777216u -> listOf(
+//            ((this shr 16) and 255u),
+//            ((this shr 8) and 255u),
+//            (this and 255u)
+//        )
+//
+//        this < 4294967296u -> listOf(
+//            ((this shr 24) and 255u),
+//            ((this shr 16) and 255u),
+//            ((this shr 8) and 255u),
+//            (this and 255u)
+//        )
+//
+//        this < 1099511627776u -> listOf(
+//            ((this shr 32) and 255u),
+//            ((this shr 24) and 255u),
+//            ((this shr 16) and 255u),
+//            ((this shr 8) and 255u),
+//            (this and 255u)
+//        )
+//
+//        this < 281474976710656u -> listOf(
+//            ((this shr 40) and 255u),
+//            ((this shr 32) and 255u),
+//            ((this shr 24) and 255u),
+//            ((this shr 16) and 255u),
+//            ((this shr 8) and 255u),
+//            (this and 255u)
+//        )
+//
+//        this < 72057594037927936u -> listOf(
+//            ((this shr 48) and 255u),
+//            ((this shr 40) and 255u),
+//            ((this shr 32) and 255u),
+//            ((this shr 24) and 255u),
+//            ((this shr 16) and 255u),
+//            ((this shr 8) and 255u),
+//            (this and 255u)
+//        )
+//
+//        else -> listOf(
+//            ((this shr 56) and 255u),
+//            ((this shr 48) and 255u),
+//            ((this shr 40) and 255u),
+//            ((this shr 32) and 255u),
+//            ((this shr 24) and 255u),
+//            ((this shr 16) and 255u),
+//            ((this shr 8) and 255u),
+//            (this and 255u)
+//        )
+//    }.map {
+//        it.toInt()
+//    }
+//)
 
 /**
  * Convert a [Long] to a [ByteArray]. The resulting array only has as many bytes as are necessary to store all bits
  * without any leading zero bytes.  Negative [Long] input will always result in an array with eight bytes.
  *
- * @see ULong.toByteArrayWithoutLeadingZeros
+ * @see ULong toByteArrayWithoutLeadingZeros
  */
 @Suppress("DuplicatedCode")
-fun Long.toByteArrayWithoutLeadingZeros(): Result<ByteArray> = Result.success(
+fun Long.toByteArrayWithoutLeadingZeros(): Result<List<Int>> = Result.success(
     when {
 
-        this < 0 -> byteArrayOf(
+        this < 0 -> listOf(
             ((this shr 56) and 255).toByte(),
             ((this shr 48) and 255).toByte(),
             ((this shr 40) and 255).toByte(),
@@ -479,30 +479,30 @@ fun Long.toByteArrayWithoutLeadingZeros(): Result<ByteArray> = Result.success(
             (this and 255).toByte()
         )
 
-        this < 256 -> byteArrayOf(
+        this < 256 -> listOf(
             (this and 255).toByte()
         )
 
-        this < 65536 -> byteArrayOf(
+        this < 65536 -> listOf(
             ((this shr 8) and 255).toByte(),
             (this and 255).toByte()
 
         )
 
-        this < 16777216 -> byteArrayOf(
+        this < 16777216 -> listOf(
             ((this shr 16) and 255).toByte(),
             ((this shr 8) and 255).toByte(),
             (this and 255).toByte()
         )
 
-        this < 4294967296 -> byteArrayOf(
+        this < 4294967296 -> listOf(
             ((this shr 24) and 255).toByte(),
             ((this shr 16) and 255).toByte(),
             ((this shr 8) and 255).toByte(),
             (this and 255).toByte()
         )
 
-        this < 1099511627776 -> byteArrayOf(
+        this < 1099511627776 -> listOf(
             ((this shr 32) and 255).toByte(),
             ((this shr 24) and 255).toByte(),
             ((this shr 16) and 255).toByte(),
@@ -510,7 +510,7 @@ fun Long.toByteArrayWithoutLeadingZeros(): Result<ByteArray> = Result.success(
             (this and 255).toByte()
         )
 
-        this < 281474976710656 -> byteArrayOf(
+        this < 281474976710656 -> listOf(
             ((this shr 40) and 255).toByte(),
             ((this shr 32) and 255).toByte(),
             ((this shr 24) and 255).toByte(),
@@ -519,7 +519,7 @@ fun Long.toByteArrayWithoutLeadingZeros(): Result<ByteArray> = Result.success(
             (this and 255).toByte()
         )
 
-        this < 72057594037927936 -> byteArrayOf(
+        this < 72057594037927936 -> listOf(
             ((this shr 48) and 255).toByte(),
             ((this shr 40) and 255).toByte(),
             ((this shr 32) and 255).toByte(),
@@ -529,7 +529,7 @@ fun Long.toByteArrayWithoutLeadingZeros(): Result<ByteArray> = Result.success(
             (this and 255).toByte()
         )
 
-        else -> byteArrayOf(
+        else -> listOf(
             ((this shr 56) and 255).toByte(),
             ((this shr 48) and 255).toByte(),
             ((this shr 40) and 255).toByte(),
@@ -539,31 +539,22 @@ fun Long.toByteArrayWithoutLeadingZeros(): Result<ByteArray> = Result.success(
             ((this shr 8) and 255).toByte(),
             (this and 255).toByte()
         )
-    }
+    }.map { it.toInt() }
 )
 
-///**
-// * Write a [Long] to a [PoorMansByteBuffer]
-// *
-// * @see Long.toByteArrayWithoutLeadingZeros
-// */
-//fun PoorMansByteBuffer.writeLongNoLeadingZeros(i: Long) =
-//    i.toByteArrayWithoutLeadingZeros().map { bytes -> writeByteArray(bytes) }
-
 /**
- * Convert [UInt] to [ByteArray]
+ * Convert UInt to a list of int
  *
- * @see ULong.toByteArrayWithoutLeadingZeros
+ * See ULong toByteArrayWithoutLeadingZeros
  */
-@ExperimentalUnsignedTypes
-fun UInt.toByteArrayWithoutLeadingZeros(): Result<UByteArray> = toULong().toByteArrayWithoutLeadingZeros()
+//fun UInt.toByteArrayWithoutLeadingZeros(): Result<List<Int>> = toULong().toByteArrayWithoutLeadingZeros()
 
 /**
  * Convert [Int] to [ByteArray]
  *
  * @see Long.toByteArrayWithoutLeadingZeros
  */
-fun Int.toByteArrayWithoutLeadingZeros(): Result<ByteArray> =
+fun Int.toByteArrayWithoutLeadingZeros(): Result<List<Int>> =
     (toLong() and 0xFFFFFFFF).toByteArrayWithoutLeadingZeros()
 
 ///**
