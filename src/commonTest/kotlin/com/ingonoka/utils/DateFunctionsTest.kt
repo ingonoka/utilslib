@@ -26,11 +26,23 @@ class DateFunctionsTest {
                 .fromEpochSeconds(0L)
                 .formatTime(timeZone = TimeZone.UTC)
         )
+
+        assertEquals(
+            "1970-01-01T00:00:00+00:00",
+            0L.formatTime(timeZone = TimeZone.UTC)
+        )
+
+
         assertEquals(
             "2020-07-14T10:17:48+00:00",
             Instant
                 .fromEpochSeconds(1594721868L)
                 .formatTime(timeZone = TimeZone.UTC)
+        )
+
+        assertEquals(
+            "2020-07-14T10:17:48+00:00",
+            1594721868L.formatTime(timeZone = TimeZone.UTC)
         )
     }
 

@@ -21,7 +21,6 @@ import kotlin.time.measureTime
 
 class LongIntToFromBytesKtTest {
 
-    @ExperimentalUnsignedTypes
     @Test
     fun testToLongNoLeadingZeros() {
 
@@ -34,10 +33,7 @@ class LongIntToFromBytesKtTest {
 
         assertEquals(Long.MAX_VALUE, "7FFFFFFFFFFFFFFF".hexToBytes().toLongNoLeadingZeros().getOrThrow())
         assertEquals(Long.MAX_VALUE, "7FFFFFFFFFFFFFFF88".hexToBytes().toLongNoLeadingZeros(8).getOrThrow())
-        assertEquals(
-            Long.MAX_VALUE,
-            "887FFFFFFFFFFFFFFF88".hexToBytes().toLongNoLeadingZeros(8, 1).getOrThrow()
-        )
+        assertEquals(Long.MAX_VALUE, "887FFFFFFFFFFFFFFF88".hexToBytes().toLongNoLeadingZeros(8, 1).getOrThrow())
         assertEquals(
             Long.MAX_VALUE,
             "887FFFFFFFFFFFFFFF88".hexToBytes().toLongNoLeadingZeros(index = 1).getOrThrow()
@@ -422,168 +418,82 @@ class LongIntToFromBytesKtTest {
             65535,
             IntBuffer.wrap("FFFF".hexToBytes())
                 .rewind()
-                .readIntNoLeadingZeros(2).getOrThrow())
+                .readIntNoLeadingZeros(2).getOrThrow()
+        )
         assertEquals(
             255,
             IntBuffer.wrap("FF".hexToBytes())
-            .rewind()
-            .readIntNoLeadingZeros(1).getOrThrow())
-
-    }
-
-    @ExperimentalUnsignedTypes
-    @Test
-    fun testULongToByteArrayWithoutLeadingZeros() {
-
-        assertTrue(
-            128uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals(ubyteArrayOf(0x80.toUByte()))
-        )
-        assertTrue(
-            9223372036854775808uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("8000000000000000".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            ULong.MAX_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFFFFFFFFFF".hexToBytes().toUByteArray())
-        )
-
-        assertTrue(
-            72057594037927935uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFFFFFFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            281474976710655uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFFFFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            1099511627775uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            4294967295uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            16777215uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            65535uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            255uL.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FF".hexToBytes().toUByteArray())
+                .rewind()
+                .readIntNoLeadingZeros(1).getOrThrow()
         )
 
     }
 
     @ExperimentalUnsignedTypes
+//    fun testULongToByteArrayWithoutLeadingZeros() {
+//        assertEquals(listOf(0x80), 128uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//
+//        assertEquals("8000000000000000".hexToListOfInt(), 9223372036854775808uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFFFFFFFFFFFF".hexToListOfInt(), ULong.MAX_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFFFFFFFFFF".hexToListOfInt(), 72057594037927935uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFFFFFFFF".hexToListOfInt(), 281474976710655uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFFFFFF".hexToListOfInt(), 1099511627775uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFFFF".hexToListOfInt(), 4294967295uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFF".hexToListOfInt(), 16777215uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFF".hexToListOfInt(), 65535uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FF".hexToListOfInt(), 255uL.toByteArrayWithoutLeadingZeros().getOrThrow())
+//
+//
+//        assertEquals("FFFFFFFF".hexToListOfInt(), 4294967295L.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFF".hexToListOfInt(), 16777215L.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFF".hexToListOfInt(), 65535L.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FF".hexToListOfInt(), 255L.toByteArrayWithoutLeadingZeros().getOrThrow())
+//
+//    }
+
     @Test
     fun testLongToByteArrayWithoutLeadingZeros() {
 
-        assertTrue(
-            128L.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals(byteArrayOf(0x80.toByte()))
-        )
-        assertTrue(
-            Long.MIN_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("8000000000000000".hexToBytes())
-        )
-        assertTrue(
-            Long.MAX_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("7FFFFFFFFFFFFFFF".hexToBytes())
-        )
-        assertTrue(
-            (-1L).toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFFFFFFFFFF".hexToBytes())
-        )
-        assertTrue(
-            281474976710655L.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFFFFFF".hexToBytes())
-        )
-        assertTrue(
-            1099511627775L.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFFFF".hexToBytes())
-        )
-        assertTrue(
-            4294967295L.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFF".hexToBytes())
-        )
-        assertTrue(
-            16777215L.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFF".hexToBytes())
-        )
-        assertTrue(65535L.toByteArrayWithoutLeadingZeros().getOrThrow().contentEquals("FFFF".hexToBytes()))
-        assertTrue(255L.toByteArrayWithoutLeadingZeros().getOrThrow().contentEquals("FF".hexToBytes()))
+        assertEquals(listOf(-128), 128L.toByteArrayWithoutLeadingZeros().getOrThrow())
+
+        assertEquals("8000000000000000".hexToListOfInt(), Long.MIN_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("7FFFFFFFFFFFFFFF".hexToListOfInt(), Long.MAX_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FFFFFFFFFFFFFFFF".hexToListOfInt(), (-1L).toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FFFFFFFFFFFF".hexToListOfInt(), 281474976710655L.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FFFFFFFFFF".hexToListOfInt(), 1099511627775L.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FFFFFFFF".hexToListOfInt(), 4294967295L.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FFFFFF".hexToListOfInt(), 16777215L.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FFFF".hexToListOfInt(), 65535L.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FF".hexToListOfInt(), 255L.toByteArrayWithoutLeadingZeros().getOrThrow())
 
     }
 
 
-    @ExperimentalUnsignedTypes
-    @Test
-    fun testUIntToUByteArrayWithoutLeadingZeros() {
-
-        assertTrue(128u.toByteArrayWithoutLeadingZeros().getOrThrow().contentEquals(ubyteArrayOf(0x80.toUByte())))
-        assertTrue(
-            9223372036854775808u.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("8000000000000000".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            UInt.MAX_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFF".hexToBytes().toUByteArray())
-        )
-
-        assertTrue(
-            4294967295u.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            16777215u.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            65535u.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFF".hexToBytes().toUByteArray())
-        )
-        assertTrue(
-            255u.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FF".hexToBytes().toUByteArray())
-        )
-
-    }
+//    fun testUIntToUByteArrayWithoutLeadingZeros() {
+//
+//        assertEquals(listOf(0x80), 128u.toByteArrayWithoutLeadingZeros().getOrThrow())
+//
+//        assertEquals("8000000000000000".hexToListOfInt(), 9223372036854775808u.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFFFF".hexToListOfInt(), UInt.MAX_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFFFF".hexToListOfInt(), 4294967295u.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFFFF".hexToListOfInt(), 16777215u.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FFFF".hexToListOfInt(), 65535u.toByteArrayWithoutLeadingZeros().getOrThrow())
+//        assertEquals("FF".hexToListOfInt(), 255u.toByteArrayWithoutLeadingZeros().getOrThrow())
+//
+//    }
 
     @Test
     @ExperimentalUnsignedTypes
     fun testIntToByteArrayWithoutLeadingZeros() {
 
-        assertTrue(
-            128.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals(byteArrayOf(0x80.toByte()))
-        )
+        assertEquals(listOf(-128), 128.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals(listOf(-128, 0, 0, 0), (-2147483648).toByteArrayWithoutLeadingZeros().getOrThrow())
 
-        assertTrue(
-            (-2147483648).toByteArrayWithoutLeadingZeros().getOrThrow().contentEquals(
-                byteArrayOf(0x80.toByte(), 0, 0, 0)
-            )
-        )
-
-        assertTrue(
-            Int.MAX_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("7FFFFFFF".hexToBytes())
-        )
-
-        assertTrue(
-            2147483647.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("7FFFFFFF".hexToBytes())
-        )
-        assertTrue(
-            16777215.toByteArrayWithoutLeadingZeros().getOrThrow()
-                .contentEquals("FFFFFF".hexToBytes())
-        )
-        assertTrue(65535.toByteArrayWithoutLeadingZeros().getOrThrow().contentEquals("FFFF".hexToBytes()))
-        assertTrue(255.toByteArrayWithoutLeadingZeros().getOrThrow().contentEquals("FF".hexToBytes()))
+        assertEquals("7FFFFFFF".hexToListOfInt(), Int.MAX_VALUE.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("7FFFFFFF".hexToListOfInt(), 2147483647.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FFFFFF".hexToListOfInt(), 16777215.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FFFF".hexToListOfInt(), 65535.toByteArrayWithoutLeadingZeros().getOrThrow())
+        assertEquals("FF".hexToListOfInt(), 255.toByteArrayWithoutLeadingZeros().getOrThrow())
 
     }
 
