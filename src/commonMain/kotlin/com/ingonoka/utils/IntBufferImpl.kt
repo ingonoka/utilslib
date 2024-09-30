@@ -729,6 +729,7 @@ class IntBufferImpl internal constructor(
     }
 
     override fun rewind(): ReadIntBuffer {
+        watermark = position
         position = 0
         return this
     }
