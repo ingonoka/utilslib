@@ -11,9 +11,73 @@ package com.ingonoka.utils
 
 import kotlin.test.*
 
-
 class UtilsTest {
 
+//    fun testTest() {
+//        val bpl = 16
+//
+//        val ba = 0xFFFFFFu.toUBytes()
+//        val ba1 = 0xFFFFFFu.toUBytes(false)
+//
+//        val b1: UByte = 0xFFu
+//        val b2: UByte = 1u
+//        val b3 = b1.toUInt() shr 1
+////        println("[${ba.toHexString(HexFormat { bytes { byteSeparator = ", " } })}]")
+////        println("[${ba1.toHexString(HexFormat { bytes { byteSeparator = ", " } })}]")
+//
+//
+//        val ba2 = UByteArray(128) { it.toUByte() }
+//
+////        println(ba2.toHexString(HexFormat { bytes { byteSeparator = " " } }))
+////        println(ba2.toHexShort())
+//
+//        val s = with(ba2) {
+//            toHexString(HexFormat {
+//                bytes {
+//                    upperCase = true
+//                    bytePrefix = "0x"
+//                    byteSeparator = ", "
+//                    bytesPerLine = bpl
+//                }
+//            }).lines().mapIndexed { i, s ->
+//                "$s   " +
+//                        buildString {
+//                            for (j in i * bpl until i * bpl + bpl) {
+//                               this@with[j].toInt().toChar().let {
+//                                   append(when (it) {
+//                                       in ' '..'~' -> it
+//                                       else -> '.'
+//                                   })
+//                               }
+//                            }
+//                        }
+//            }
+//        }.joinToString("\n")
+//
+//        println(s)
+////        println(ba2.toHex(true))
+//
+//
+////        measureTime {
+////            repeat(1_000_000) {
+////                ba2.toHexString(HexFormat { bytes { byteSeparator = ", " } })
+////            }
+////        }.also { println("Std API: $it") }
+////
+////        measureTime {
+////            repeat(1_000_000) {
+////                ba2.toHexShort()
+////            }
+////        }.also { println("Own: $it") }
+////
+////        measureTime {
+////            repeat(1_000_000) { 0xFFFFFFu.toUBytes() }
+////        }.also { println(it) }
+////
+////        measureTime {
+////            repeat(1_000_000) { 0xFFFFFF.toByteArrayWithoutLeadingZeros() }
+////        }.also { println(it) }
+//    }
 
     @Test
     fun testBuildByteArray() {
@@ -97,6 +161,7 @@ sealed class TestSealedClass(val state: Int) {
         return "TestSealedClass(state=$state)"
     }
 }
+
 class TestSealedClass1 : TestSealedClass(1)
 class TestSealedClass2 : TestSealedClass(2)
 class SomeOtherClass

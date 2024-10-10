@@ -8,6 +8,7 @@
  */
 
 package com.ingonoka.utils
+
 /**
  * The alphabet of Base64 according to https://tools.ietf.org/html/rfc4648
  */
@@ -140,12 +141,42 @@ val indicesTwo = intArrayOf(
 )
 
 /**
- * Convert an array of bytes into base64
+ * TO BASE64
  */
 
-fun ByteArray.toBase64(): ByteArray {
+/**
+ * Encode string to UTF-8 and encode result to base 64
+ *
+ * @return List of integers. Each element represents a UTF-8 encoded character from
+ * the Base64 alphabet
+ */
+fun String.toBase64(): List<Int> = encodeToByteArray().toBase64()
 
-    if (isEmpty()) return byteArrayOf()
+/**
+ * Encode a list of bytes into BASE64
+ *
+ * @return List of integers. Each element represents a UTF-8 encoded character from
+ * the Base64 alphabet
+ */
+fun List<Int>.toBase64(): List<Int> = toByteArray().toBase64()
+
+/**
+ * Convert a string of bytes available from a [ReadBuffer] into base64
+ *
+ * @return List of integers. Each element represents a UTF-8 encoded character from
+ * the Base64 alphabet
+ */
+fun ReadBuffer.toBase64(): List<Int> = readRemaining().getOrThrow().toByteArray().toBase64()
+
+/**
+ * Convert an array of bytes into base64
+ *
+ * @return List of integers. Each element represents a UTF-8 encoded character from
+ * the Base64 alphabet
+ */
+fun ByteArray.toBase64(): List<Int> {
+
+    if (isEmpty()) return listOf()
 
     val resultSize = ((size + 2) / 3) * 4
 
@@ -188,82 +219,55 @@ fun ByteArray.toBase64(): ByteArray {
         }
     }
 
-    return resultBuffer
+    return resultBuffer.toListOfInt()
 }
 
 /**
- * Convert a string of bytes available from a [ReadIntBuffer] into base64
+ * FROM BASE64
  */
-fun ReadIntBuffer.toBase64(): ByteArray = readRemaining().getOrThrow().toByteArray().toBase64()
 
-fun String.fromBase64(): ByteArray {
+/**
+ * Convert a Base 64 string of characters into bytes.
+ *
+ * @return List of integers. Each element is within the value range of a Byte
+ */
+fun String.fromBase64(): List<Int> = encodeToByteArray().fromBase64()
 
-    require(length % 4 == 0)
-
-    if (isEmpty()) return byteArrayOf()
-
-    var resultSize = (length / 4) * 3
-
-    if (get(length - 1) == '=') {
-        resultSize--
-        if (get(length - 2) == '=') {
-            resultSize--
-        }
-    }
-
-    val resultBuffer = ByteArray(resultSize)
-
-    var inIndex = 0
-    var outIndex = 0
-
-    while (inIndex < length) {
-
-        val firstCharacter = get(inIndex++).code
-        val secondCharacter = get(inIndex++).code
-        val thirdCharacter = get(inIndex++).code
-        val fourthCharacter = get(inIndex++).code
-
-        val numInt =
-            indicesFour[firstCharacter] or indicesThree[secondCharacter] or indicesTwo[thirdCharacter] or indicesOne[fourthCharacter]
-
-        if (fourthCharacter != 0x3D) {
-            resultBuffer[outIndex++] = ((numInt ushr 16) and 0xFF).toByte()
-            resultBuffer[outIndex++] = ((numInt ushr 8) and 0xFF).toByte()
-            resultBuffer[outIndex++] = (numInt and 0xFF).toByte()
-        } else {
-            if (thirdCharacter != 0x3D) {
-                resultBuffer[outIndex++] = ((numInt ushr 16) and 0xFF).toByte()
-                resultBuffer[outIndex++] = ((numInt ushr 8) and 0xFF).toByte()
-            } else {
-                resultBuffer[outIndex++] = ((numInt ushr 16) and 0xFF).toByte()
-            }
-        }
-    }
-
-    return resultBuffer
+/**
+ * Convert a list of integers into bytes.
+ * The integers will be interpreted as UTF-8 encoded Base64 characters
+ *
+ * @return List of integers. Each element is within the value range of a Byte
+ */
+fun List<Int>.fromBase64(): List<Int> {
+    val ba = ByteArray(size)
+    for(i in indices) ba[i] = this[i].toByte()
+    return ba.fromBase64()
 }
 
 /**
- * Convert an array of Base64 characters to a [ByteArray]
+ * Convert integers from a [ReadBuffer] into bytes.
+ * The integers are interpreted as UTF-8 encoded Base64 characters.
+ *
+ * @return List of integers. Each element is within the value range of a Byte
  */
-fun ByteArray.fromBase64(): ByteArray {
+fun ReadBuffer.fromBase64(): List<Int> = readRemaining().getOrThrow().toByteArray().fromBase64()
+
+/**
+ * Convert bytes from a [ByteArray] into bytes.
+ * The integers are interpreted as UTF-8 encoded Base64 characters.
+ *
+ * @return List of integers. Each element is within the value range of a Byte
+ */
+fun ByteArray.fromBase64(): List<Int> {
 
     require(size % 4 == 0)
 
-    if (isEmpty()) return byteArrayOf()
+    if (isEmpty()) return listOf()
 
-    var resultSize = (size / 4) * 3
-
-    if (get(size - 1) == 0x3D.toByte()) {
-        resultSize--
-        if (get(size - 2) == '='.code.toByte()) {
-            resultSize--
-        }
-    }
-    val resultBuffer = ByteArray(resultSize)
+    val resultBuffer = mutableListOf<Int>()
 
     var inIndex = 0
-    var outIndex = 0
 
     while (inIndex < size) {
 
@@ -276,27 +280,22 @@ fun ByteArray.fromBase64(): ByteArray {
             indicesFour[firstCharacter] or indicesThree[secondCharacter] or indicesTwo[thirdCharacter] or indicesOne[fourthCharacter]
 
         if (fourthCharacter != 0x3D) {
-            resultBuffer[outIndex++] = ((numInt ushr 16) and 0xFF).toByte()
-            resultBuffer[outIndex++] = ((numInt ushr 8) and 0xFF).toByte()
-            resultBuffer[outIndex++] = (numInt and 0xFF).toByte()
+            resultBuffer.add(numInt and 0xFF0000 ushr 16)
+            resultBuffer.add(numInt and 0xFF00 ushr 8)
+            resultBuffer.add(numInt and 0xFF)
         } else {
             if (thirdCharacter != 0x3D) {
-                resultBuffer[outIndex++] = ((numInt ushr 16) and 0xFF).toByte()
-                resultBuffer[outIndex++] = ((numInt ushr 8) and 0xFF).toByte()
+                resultBuffer.add(numInt and 0xFF0000 ushr 16)
+                resultBuffer.add(numInt and 0xFF00 ushr 8)
             } else {
-                resultBuffer[outIndex++] = ((numInt ushr 16) and 0xFF).toByte()
+                resultBuffer.add(numInt and 0xFF0000 ushr 16)
             }
         }
     }
 
     return resultBuffer
+
 }
-
-
-/**
- * Convert Base64 characters from a [ReadIntBuffer] into the original bytes
- */
-fun ReadIntBuffer.fromBase64(): ByteArray = readRemaining().getOrThrow().toByteArray().fromBase64()
 
 fun Char.isBase64(): Boolean = (alphabet.find { it.toInt().toChar() == this } != null) || this == '='
 

@@ -10,22 +10,25 @@
 package com.ingonoka.utils
 
 import com.ingonoka.hexutils.hexToBytes
+import com.ingonoka.hexutils.hexToListOfInt
+import com.ingonoka.hexutils.toHexShortShort
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.measureTime
 
 class Base64KtTest {
 
     @Test
     fun testToBase64() {
 
-        assertEquals("Zg==", "f".encodeToByteArray().toBase64().decodeToString())
-        assertEquals("Zm8=", "fo".encodeToByteArray().toBase64().decodeToString())
-        assertEquals("Zm9v", "foo".encodeToByteArray().toBase64().decodeToString())
-        assertEquals("Zm9vYg==", "foob".encodeToByteArray().toBase64().decodeToString())
-        assertEquals("Zm9vYmE=", "fooba".encodeToByteArray().toBase64().decodeToString())
-        assertEquals("Zm9vYmFy", "foobar".encodeToByteArray().toBase64().decodeToString())
+        assertEquals("Zg==".map { it.code }, "f".encodeToByteArray().toBase64())
+        assertEquals("Zm8=".map { it.code }, "fo".encodeToByteArray().toBase64())
+        assertEquals("Zm9v".map { it.code }, "foo".encodeToByteArray().toBase64())
+        assertEquals("Zm9vYg==".map { it.code }, "foob".encodeToByteArray().toBase64())
+        assertEquals("Zm9vYmE=".map { it.code }, "fooba".encodeToByteArray().toBase64())
+        assertEquals("Zm9vYmFy".map { it.code }, "foobar".encodeToByteArray().toBase64())
 
         val bytes = ("8505435056303161564F06514341543031634CC103131388C2020113C3045D78DCB6C4020384DE37023034021" +
                 "859527B7951E77EB6CB250149FFA2006B1A415297D13AA48A021840986DC05DB2235088DB459938982" +
@@ -33,39 +36,92 @@ class Base64KtTest {
 
         val expected =
             ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
-                    "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").encodeToByteArray()
+                    "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").map { it.code }
 
-        assertTrue(expected.contentEquals(bytes.toBase64()))
+        assertEquals(expected, bytes.toBase64())
 
-        assertArrayEquals(expected.toTypedArray(), IntBuffer.wrap(bytes).toBase64().toTypedArray())
+    }
+
+    @Test
+    fun testFromListOfIntToBase64() {
+
+        assertEquals("Zg==".map { it.code }, "f".encodeToByteArray().toListOfInt().toBase64())
+        assertEquals("Zm8=".map { it.code }, "fo".encodeToByteArray().toListOfInt().toBase64())
+        assertEquals("Zm9v".map { it.code }, "foo".encodeToByteArray().toListOfInt().toBase64())
+        assertEquals("Zm9vYg==".map { it.code }, "foob".encodeToByteArray().toListOfInt().toBase64())
+        assertEquals("Zm9vYmE=".map { it.code }, "fooba".encodeToByteArray().toListOfInt().toBase64())
+        assertEquals("Zm9vYmFy".map { it.code }, "foobar".encodeToByteArray().toListOfInt().toBase64())
+
+        val bytes = ("8505435056303161564F06514341543031634CC103131388C2020113C3045D78DCB6C4020384DE37023034021" +
+                "859527B7951E77EB6CB250149FFA2006B1A415297D13AA48A021840986DC05DB2235088DB459938982" +
+                "3A324842E73A635B3FD").hexToListOfInt()
+
+        val expected =
+            ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
+                    "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").map { it.code }
+
+        assertEquals(expected, bytes.toBase64())
+    }
+
+    @Test
+    fun testFromStringToBase64() {
+
+        assertEquals("Zg==".map { it.code }, "f".toBase64())
+        assertEquals("Zm8=".map { it.code }, "fo".toBase64())
+        assertEquals("Zm9v".map { it.code }, "foo".toBase64())
+        assertEquals("Zm9vYg==".map { it.code }, "foob".toBase64())
+        assertEquals("Zm9vYmE=".map { it.code }, "fooba".toBase64())
+        assertEquals("Zm9vYmFy".map { it.code }, "foobar".toBase64())
+
+    }
+
+    @Test
+    fun testFromIntBufferToBase64() {
+
+        assertEquals("Zg==".map { it.code }, BufferImpl.wrap("f".encodeToByteArray()).toBase64())
+        assertEquals("Zm8=".map { it.code }, BufferImpl.wrap("fo".encodeToByteArray()).toBase64())
+        assertEquals("Zm9v".map { it.code }, BufferImpl.wrap("foo".encodeToByteArray()).toBase64())
+        assertEquals("Zm9vYg==".map { it.code }, BufferImpl.wrap("foob".encodeToByteArray()).toBase64())
+        assertEquals("Zm9vYmE=".map { it.code }, BufferImpl.wrap("fooba".encodeToByteArray()).toBase64())
+        assertEquals("Zm9vYmFy".map { it.code }, BufferImpl.wrap("foobar".encodeToByteArray()).toBase64())
+
+        val bytes = ("8505435056303161564F06514341543031634CC103131388C2020113C3045D78DCB6C4020384DE37023034021" +
+                "859527B7951E77EB6CB250149FFA2006B1A415297D13AA48A021840986DC05DB2235088DB459938982" +
+                "3A324842E73A635B3FD").hexToBytes()
+
+        val expected =
+            ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
+                    "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").map { it.code }
+
+        assertEquals(expected, BufferImpl.wrap(bytes).toBase64())
+
     }
 
     @Test
     fun testFromBase64() {
 
-        assertEquals("f", "Zg==".fromBase64().decodeToString())
-        assertEquals("fo", "Zm8=".fromBase64().decodeToString())
-        assertEquals("foo", "Zm9v".fromBase64().decodeToString())
-        assertEquals("foob", "Zm9vYg==".fromBase64().decodeToString())
-        assertEquals("fooba", "Zm9vYmE=".fromBase64().decodeToString())
-        assertEquals("foobar", "Zm9vYmFy".fromBase64().decodeToString())
+        assertEquals("f", "Zg==".fromBase64().toByteArray().decodeToString())
+        assertEquals("fo", "Zm8=".fromBase64().toByteArray().decodeToString())
+        assertEquals(listOf('f'.code, 'o'.code, 'o'.code), "Zm9v".fromBase64())
+        assertEquals("foob".map { it.code }, "Zm9vYg==".fromBase64())
+        assertEquals("fooba".map { it.code }, "Zm9vYmE=".fromBase64())
+        assertEquals("foobar".map { it.code }, "Zm9vYmFy".fromBase64())
 
-        assertTrue("f".encodeToByteArray().contentEquals("Zg==".encodeToByteArray().fromBase64()))
-        assertTrue("fo".encodeToByteArray().contentEquals("Zm8=".encodeToByteArray().fromBase64()))
-        assertTrue("foo".encodeToByteArray().contentEquals("Zm9v".encodeToByteArray().fromBase64()))
-        assertTrue("foob".encodeToByteArray().contentEquals("Zm9vYg==".encodeToByteArray().fromBase64()))
-        assertTrue("fooba".encodeToByteArray().contentEquals("Zm9vYmE=".encodeToByteArray().fromBase64()))
-        assertTrue("foobar".encodeToByteArray().contentEquals("Zm9vYmFy".encodeToByteArray().fromBase64()))
+        assertEquals("f".map { it.code }, "Zg==".fromBase64())
+        assertEquals("fo".map { it.code }, "Zm8=".fromBase64())
+        assertEquals("foo".map { it.code }, "Zm9v".fromBase64())
+        assertEquals("foob".map { it.code }, "Zm9vYg==".fromBase64())
+        assertEquals("fooba".map { it.code }, "Zm9vYmE=".fromBase64())
+        assertEquals("foobar".map { it.code }, "Zm9vYmFy".fromBase64())
 
 
         val expected = ("8505435056303161564F06514341543031634CC103131388C2020113C3045D78DCB6C4020384DE37023034021" +
                 "859527B7951E77EB6CB250149FFA2006B1A415297D13AA48A021840986DC05DB2235088DB459938982" +
-                "3A324842E73A635B3FD").hexToBytes()
+                "3A324842E73A635B3FD")
         val actual = ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
-                "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").fromBase64()
+                "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").fromBase64().toHexShortShort()
 
-        assertTrue(expected.contentEquals(actual))
-
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -73,35 +129,69 @@ class Base64KtTest {
         val buf = ("8505435056303161564F06514341543031634CC103131388C2020113C3045D78DCB6C4020384DE37023034021" +
                 "859527B7951E77EB6CB250149FFA2006B1A415297D13AA48A021840986DC05DB2235088DB459938982" +
                 "3A324842E73A635B3FD").hexToBytes()
-        repeat(1000000) { buf.toBase64() }
+
+        buf.toHexString()
+
+        measureTime {
+            repeat(1_000_000) { buf.toBase64() }
+        }.also {
+            println("ByteArray.toBase64: ${it / 1_000_000}")
+        }
     }
 
     @Test
     fun testSpeedStringFromBase64() {
-        val arr = "hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
-                "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0="
+        val arr = "hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7e" +
+                "VHnfrbLJQFJ/6IAaxpBUpfROqSKAhhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0="
 
-        repeat(1000000) { arr.fromBase64() }
+        measureTime {
+            repeat(1_000_000) { arr.fromBase64() }
+        }.also {
+            println("String.fromBase64: ${it/1_000_000}")
+        }
 
     }
 
     @Test
     fun testSpeedByteArrayFromBase64() {
-        val arr = ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
+        val b64 = ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
                 "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").encodeToByteArray()
 
-        repeat(1000000) { arr.fromBase64() }
+        measureTime {
+            repeat(1_000_000) { b64.fromBase64() }
+        }.also {
+            println("ByteArray.fromBase64: ${it/1_000_000}")
+        }
+
+    }
+
+    @Test
+    fun testSpeedListOfIntFromBase64() {
+        val b64 = ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
+                "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").map { it.code }
+
+        measureTime {
+            repeat(1_000_000) {
+                b64.fromBase64()
+            }
+        }.also {
+            println("List<Int>.fromBase64: ${it/1_000_000}")
+        }
 
     }
 
     @Test
     fun testSpeedByteReadPacketFromBase64() {
-        val arr = IntBuffer.wrap(
+        val b64 = BufferImpl.wrap(
             ("hQVDUFYwMWFWTwZRQ0FUMDFjTMEDExOIwgIBE8MEXXjctsQCA4TeNwIwNAIYWVJ7eVHnfrbLJQFJ/6IAaxpBUpfROqSKA" +
                     "hhAmG3AXbIjUIjbRZk4mCOjJIQuc6Y1s/0=").encodeToByteArray()
         )
 
-        repeat(1000000) { arr.fromBase64() }
+        measureTime {
+            repeat(1_000_000) { b64.fromBase64() }
+        }.also {
+            println("ReadIntBuffer.fromBase64: ${it/1_000_000}")
+        }
 
     }
 
@@ -115,7 +205,7 @@ class Base64KtTest {
     @Test
     fun testIsBase64() {
 
-        for(c in alphabet) {
+        for (c in alphabet) {
             assertTrue(c.toInt().toChar().isBase64())
         }
 
@@ -130,5 +220,4 @@ class Base64KtTest {
         assertFalse("ABC&".isBase64())
 
     }
-
 }

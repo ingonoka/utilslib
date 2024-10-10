@@ -12,43 +12,44 @@ package com.ingonoka.utils
 import com.ingonoka.hexutils.hexToBytes
 import kotlin.test.*
 
-class IntBufferTest {
+class BufferTest {
 
     @Test
     fun testEquals() {
-        val b1 = listOf(1, 2, 3, 4, 5, 6).listOfIntBuffer()
-        val b2 = listOf(1, 2, 3, 4, 5, 6).listOfIntBuffer()
+        val b1 = listOf(1, 2, 3, 4, 5, 6).buffer()
+        val b2 = listOf(1, 2, 3, 4, 5, 6).buffer()
         assertEquals(b1, b2)
 
-        val b3 = IntBuffer.empty(10).also { it.write(listOf(1, 2, 3, 4, 5, 6)) }
-        val b4 = IntBuffer.empty(10).also { it.write(listOf(1, 2, 3, 4, 5, 6)) }
+        val b3 = BufferImpl.empty(10).also { it.write(listOf(1, 2, 3, 4, 5, 6)) }
+        val b4 = BufferImpl.empty(10).also { it.write(listOf(1, 2, 3, 4, 5, 6)) }
         assertEquals(b3, b4)
 
-        val b5 = IntBuffer.empty(10).also { it.write(listOf(1, 2, 3, 4, 5, 6)) }
-        val b6 = IntBuffer.empty(10).also { it.write(listOf(1, 2, 3, 4, 5)) }
+        val b5 = BufferImpl.empty(10).also { it.write(listOf(1, 2, 3, 4, 5, 6)) }
+        val b6 = BufferImpl.empty(10).also { it.write(listOf(1, 2, 3, 4, 5)) }
         assertNotEquals(b5, b6)
     }
 
     @Test
     fun testGetList() {
-        IntBuffer.wrap(1, 2, 3, 4, 5, 6).apply {
+        BufferImpl.wrap(1, 2, 3, 4, 5, 6).apply {
             assertEquals(listOf(1, 2, 3, 4, 5, 6), toList())
         }
-        IntBuffer.empty(10).apply {
+        BufferImpl.empty(10).apply {
             write(listOf(1, 2, 3))
             assertEquals(listOf(1, 2, 3), toList())
         }
+
     }
 
     @Test
     fun testEmptyArray() {
-        assertFails { IntBuffer.empty(-1) }
+        assertFails { BufferImpl.empty(-1) }
 
-        val byteBuffer = IntBuffer.empty(4)
+        val byteBuffer = BufferImpl.empty(4)
         assertEquals(4, byteBuffer.capacity)
         assertEquals(0, byteBuffer.position)
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(4, byteBuffer.capacity)
             assertEquals(0, byteBuffer.position)
         }
@@ -61,11 +62,11 @@ class IntBufferTest {
     @Test
     fun testAllocate() {
 
-        var byteBuffer = IntBuffer.empty(10)
+        var byteBuffer = BufferImpl.empty(10)
         assertEquals(10, byteBuffer.capacity)
         assertEquals(0, byteBuffer.position)
 
-        byteBuffer = IntBuffer.empty()
+        byteBuffer = BufferImpl.empty()
         assertEquals(MIN_EXTEND_SIZE, byteBuffer.capacity)
         assertEquals(0, byteBuffer.position)
 
@@ -76,13 +77,13 @@ class IntBufferTest {
         byteBuffer.writeByte(0x00)
         assertEquals(MIN_EXTEND_SIZE + 1, byteBuffer.position)
 
-        byteBuffer = IntBuffer.empty(4)
+        byteBuffer = BufferImpl.empty(4)
         byteBuffer.write(0)
         assertEquals(4, byteBuffer.position)
         byteBuffer.write(0)
         assertEquals(8, byteBuffer.position)
 
-        byteBuffer = IntBuffer.empty()
+        byteBuffer = BufferImpl.empty()
         byteBuffer.write(List(MIN_EXTEND_SIZE) { 0 })
         assertEquals(MIN_EXTEND_SIZE, byteBuffer.position)
 
@@ -94,21 +95,21 @@ class IntBufferTest {
     @Test
     fun testReadByte() {
 
-        val buf1 = IntBuffer.wrap(listOf(0, 1, 2, 3, 4, 5))
+        val buf1 = BufferImpl.wrap(0, 1, 2, 3, 4, 5)
 
         assertEquals(0, buf1.position)
         assertEquals(6, buf1.watermark)
         (0..5).forEach {
-            assertEquals(it, buf1.readByte().getOrThrow())
+            assertEquals(it.toUByte(), buf1.readUByte().getOrThrow())
         }
         assertFails { buf1.readByte().getOrThrow() }
         assertEquals(6, buf1.position)
 
-        val buf2 = IntBuffer.wrap(listOf(0, 1, 2, 3, 4, 5), 3)
+        val buf2 = BufferImpl.wrap(listOf(0, 1, 2, 3, 4, 5), 3)
         assertEquals(0, buf2.position)
         assertEquals(3, buf2.watermark)
         (0..2).forEach {
-            assertEquals(it, buf2.readByte().getOrThrow())
+            assertEquals(it.toUByte(), buf2.readUByte().getOrThrow())
         }
         assertFails { buf2.readByte().getOrThrow() }
         assertEquals(3, buf2.position)
@@ -117,22 +118,22 @@ class IntBufferTest {
     @Test
     fun testReadByteOrNull() {
 
-        val buf1 = IntBuffer.wrap(listOf(0, 1, 2, 3, 4, 5))
+        val buf1 = BufferImpl.wrap(listOf(0, 1, 2, 3, 4, 5))
 
         assertEquals(0, buf1.position)
         assertEquals(6, buf1.watermark)
         (0..5).forEach {
-            assertEquals(it, buf1.readByteOrNull())
+            assertEquals(it.toByte(), buf1.readByteOrNull())
         }
 
         assertNull(buf1.readByteOrNull())
         assertEquals(6, buf1.position)
 
-        val buf2 = IntBuffer.wrap(listOf(0, 1, 2, 3, 4, 5), 3)
+        val buf2 = BufferImpl.wrap(listOf(0, 1, 2, 3, 4, 5), 3)
         assertEquals(0, buf2.position)
         assertEquals(3, buf2.watermark)
         (0..2).forEach {
-            assertEquals(it, buf2.readByteOrNull())
+            assertEquals(it.toByte(), buf2.readByteOrNull())
         }
         assertNull(buf2.readByteOrNull())
         assertEquals(3, buf2.position)
@@ -140,7 +141,7 @@ class IntBufferTest {
 
     @Test
     fun testReadWriteByte() {
-        val byteBuffer = IntBuffer.empty(2)
+        val byteBuffer = BufferImpl.empty(2)
         byteBuffer.writeByte(1)
         assertEquals(1, byteBuffer.position)
         byteBuffer.writeByte(2)
@@ -148,13 +149,13 @@ class IntBufferTest {
         byteBuffer.writeByte(3)
         assertEquals(3, byteBuffer.position)
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readByte().getOrDefault(0))
             assertEquals(2, readByte().getOrDefault(0))
             assertEquals(3, readByte().getOrDefault(0))
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readByteOrNull())
             assertEquals(2, readByteOrNull())
             assertEquals(3, readByteOrNull())
@@ -163,55 +164,55 @@ class IntBufferTest {
         byteBuffer.reset()
         byteBuffer.writeByte(0)
         byteBuffer.writeByte((-1))
-        byteBuffer.writeByte(Byte.MAX_VALUE.toInt())
-        byteBuffer.writeByte(Byte.MIN_VALUE.toInt())
+        byteBuffer.writeIntByte(UByte.MAX_VALUE.toInt())
+        byteBuffer.writeIntByte(UByte.MIN_VALUE.toInt())
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(0, readByte().getOrDefault(1))
-            assertEquals((-1), readByte().getOrDefault(0))
-            assertEquals(Byte.MAX_VALUE.toInt(), readByte().getOrDefault(0))
-            assertEquals(Byte.MIN_VALUE.toInt(), readByte().getOrDefault(0))
+            assertEquals(255, readIntByte().getOrDefault(0))
+            assertEquals(UByte.MAX_VALUE, readUByte().getOrDefault(0))
+            assertEquals(UByte.MIN_VALUE, readUByte().getOrDefault(0))
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(0, readByteOrNull())
-            assertEquals((-1), readByteOrNull())
-            assertEquals(Byte.MAX_VALUE.toInt(), readByteOrNull())
-            assertEquals(Byte.MIN_VALUE.toInt(), readByteOrNull())
+            assertEquals(255.toByte(), readByteOrNull())
+            assertEquals(UByte.MAX_VALUE, readUByteOrNull())
+            assertEquals(UByte.MIN_VALUE, readUByteOrNull())
         }
 
         byteBuffer.reset()
-        byteBuffer.write("FF".hexToBytes())
+        byteBuffer.writeIntByte(0xFF)
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertEquals(-1, readByte().getOrThrow())
+        byteBuffer.toReadBuffer().apply {
+            assertEquals(255.toByte(), readByte().getOrThrow())
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertEquals(-1, readByteOrNull())
+        byteBuffer.toReadBuffer().apply {
+            assertEquals(255.toByte(), readByteOrNull())
         }
 
         byteBuffer.reset()
-        byteBuffer.write("FFFF".hexToBytes())
+        byteBuffer.writeAll(0xFF, 0xFF)
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertEquals(-1, readByte().getOrThrow())
-            assertEquals(-1, readByte().getOrThrow())
+        byteBuffer.toReadBuffer().apply {
+            assertEquals(255.toByte(), readByte().getOrThrow())
+            assertEquals(255.toByte(), readByte().getOrThrow())
             assertFails { readByte().getOrThrow() }
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertEquals(-1, readByteOrNull())
-            assertEquals(-1, readByteOrNull())
+        byteBuffer.toReadBuffer().apply {
+            assertEquals(255.toByte(), readByteOrNull())
+            assertEquals(255.toByte(), readByteOrNull())
             assertNull(readByteOrNull())
         }
 
-        assertFails { byteBuffer.writeByte(255) }
+        assertFails { byteBuffer.writeIntByte(256) }
     }
 
     @Test
     fun testPeekByte() {
-        val byteBuffer = IntBuffer.wrap(1, 2, 3)
+        val byteBuffer = BufferImpl.wrap(1, 2, 3)
         assertEquals(0, byteBuffer.position)
         assertEquals(1, byteBuffer.peekByteOrNull())
         assertEquals(1, byteBuffer.peekByte().getOrThrow())
@@ -228,7 +229,7 @@ class IntBufferTest {
     @Test
     fun testReadWriteInt() {
         val n = 8
-        val byteBuffer = IntBuffer.empty(n)
+        val byteBuffer = BufferImpl.empty(n)
         byteBuffer.write(1)
         assertEquals(4, byteBuffer.position)
         byteBuffer.write(2)
@@ -236,14 +237,14 @@ class IntBufferTest {
         byteBuffer.write(3)
         assertEquals(12, byteBuffer.position)
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readInt().getOrDefault(0))
             assertEquals(2, readInt().getOrDefault(0))
             assertEquals(3, readInt().getOrDefault(0))
             assertFails { readInt().getOrThrow() }
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readIntOrNull())
             assertEquals(2, readIntOrNull())
             assertEquals(3, readIntOrNull())
@@ -253,37 +254,37 @@ class IntBufferTest {
         byteBuffer.reset()
         byteBuffer.write(0)
         byteBuffer.write(-1)
-        byteBuffer.write(Int.MAX_VALUE)
-        byteBuffer.write(Int.MIN_VALUE)
+        byteBuffer.write(Byte.MIN_VALUE.toInt())
+        byteBuffer.write(Byte.MAX_VALUE.toInt())
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(0, readInt().getOrDefault(1))
             assertEquals(-1, readInt().getOrDefault(0))
-            assertEquals(Int.MAX_VALUE, readInt().getOrDefault(0))
-            assertEquals(Int.MIN_VALUE, readInt().getOrDefault(0))
+            assertEquals(Byte.MIN_VALUE.toInt(), readInt().getOrDefault(0))
+            assertEquals(Byte.MAX_VALUE.toInt(), readInt().getOrDefault(0))
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(0, readIntOrNull())
             assertEquals(-1, readIntOrNull())
-            assertEquals(Int.MAX_VALUE, readIntOrNull())
-            assertEquals(Int.MIN_VALUE, readIntOrNull())
+            assertEquals(Byte.MIN_VALUE.toInt(), readIntOrNull())
+            assertEquals(Byte.MAX_VALUE.toInt(), readIntOrNull())
         }
 
         byteBuffer.reset()
         byteBuffer.write("FFFFFFFF".hexToBytes())
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(-1, readInt().getOrThrow())
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(-1, readIntOrNull())
         }
 
         byteBuffer.reset()
         byteBuffer.write(listOf(1, 0, 0, 0))
         byteBuffer.write(listOf(0, 0, 0, 1))
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readInt(byteOrder = ByteOrder.LITTLE_ENDIAN).getOrThrow())
             assertEquals(1, readInt(byteOrder = ByteOrder.BIG_ENDIAN).getOrThrow())
         }
@@ -291,7 +292,7 @@ class IntBufferTest {
         byteBuffer.reset()
         byteBuffer.write(1, byteOrder = ByteOrder.LITTLE_ENDIAN)
         byteBuffer.write(1, byteOrder = ByteOrder.BIG_ENDIAN)
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readInt(byteOrder = ByteOrder.LITTLE_ENDIAN).getOrThrow())
             assertEquals(1, readInt(byteOrder = ByteOrder.BIG_ENDIAN).getOrThrow())
         }
@@ -314,7 +315,7 @@ class IntBufferTest {
 
         assertFails { byteBuffer.write(-1, 3) }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(0xFF, readInt(1).getOrThrow())
             assertEquals(0xFFFF, readInt(2).getOrThrow())
             assertEquals(0xFFFFFF, readInt(3).getOrThrow())
@@ -337,7 +338,7 @@ class IntBufferTest {
         byteBuffer.write(Int.MIN_VALUE, 4, ByteOrder.LITTLE_ENDIAN)
         assertEquals(14, byteBuffer.position)
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readInt(1, ByteOrder.LITTLE_ENDIAN).getOrThrow())
             assertEquals(1, readInt(2, ByteOrder.LITTLE_ENDIAN).getOrThrow())
             assertEquals(1, readInt(3, ByteOrder.LITTLE_ENDIAN).getOrThrow())
@@ -347,19 +348,27 @@ class IntBufferTest {
 
         byteBuffer.reset()
         byteBuffer.write(1, 4, ByteOrder.LITTLE_ENDIAN)
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertNotEquals(1, readInt(4, ByteOrder.BIG_ENDIAN).getOrThrow())
         }
 
         byteBuffer.reset()
         byteBuffer.write(200)
-        assertEquals(listOf(0, 0, 0, -56), byteBuffer.toList())
+        assertEquals(listOf(0, 0, 0, 200), byteBuffer.toList())
+
+       byteBuffer.reset()
+        byteBuffer.write(200, 4, ByteOrder.LITTLE_ENDIAN)
+        assertEquals(listOf(200, 0, 0, 0), byteBuffer.toList())
+
+        byteBuffer.reset()
+        byteBuffer.write(256)
+        assertEquals(listOf(0, 0, 1, 0), byteBuffer.toList())
 
     }
 
     @Test
     fun testPeekInt() {
-        val byteBuffer = IntBuffer.wrap(0, 0, 0, 1, 0, 0, 0, 2)
+        val byteBuffer = BufferImpl.wrap(0, 0, 0, 1, 0, 0, 0, 2)
         assertEquals(0, byteBuffer.position)
         assertEquals(1, byteBuffer.peekIntOrNull())
         assertEquals(1, byteBuffer.peekInt().getOrThrow())
@@ -376,7 +385,7 @@ class IntBufferTest {
     @Test
     fun testReadWriteLong() {
         val n = 16
-        val byteBuffer = IntBuffer.empty(n)
+        val byteBuffer = BufferImpl.empty(n)
         byteBuffer.write(1L)
         assertEquals(8, byteBuffer.position)
         byteBuffer.write(2L)
@@ -384,14 +393,14 @@ class IntBufferTest {
         byteBuffer.write(3L)
         assertEquals(24, byteBuffer.position)
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1L, readLong().getOrDefault(0))
             assertEquals(2L, readLong().getOrDefault(0))
             assertEquals(3L, readLong().getOrDefault(0))
             assertFails { readLong().getOrThrow() }
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1L, readLongOrNull())
             assertEquals(2L, readLongOrNull())
             assertEquals(3L, readLongOrNull())
@@ -404,14 +413,14 @@ class IntBufferTest {
         byteBuffer.write(Long.MAX_VALUE)
         byteBuffer.write(Long.MIN_VALUE)
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(0, readLong().getOrDefault(1))
             assertEquals(-1L, readLong().getOrDefault(0))
             assertEquals(Long.MAX_VALUE, readLong().getOrDefault(0))
             assertEquals(Long.MIN_VALUE, readLong().getOrDefault(0))
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(0, readLongOrNull())
             assertEquals(-1L, readLongOrNull())
             assertEquals(Long.MAX_VALUE, readLongOrNull())
@@ -420,11 +429,11 @@ class IntBufferTest {
 
         byteBuffer.reset()
         byteBuffer.write("FFFFFFFFFFFFFFFF".hexToBytes())
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(-1L, readLong().getOrThrow())
             assertFails { readLong().getOrThrow() }
         }
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(-1L, readLongOrNull())
             assertNull(readLongOrNull())
         }
@@ -432,7 +441,7 @@ class IntBufferTest {
         byteBuffer.reset()
         byteBuffer.write(listOf(1, 0, 0, 0, 0, 0, 0, 0))
         byteBuffer.write(listOf(0, 0, 0, 0, 0, 0, 0, 1))
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readLong(byteOrder = ByteOrder.LITTLE_ENDIAN).getOrThrow())
             assertEquals(1, readLong(byteOrder = ByteOrder.BIG_ENDIAN).getOrThrow())
         }
@@ -440,7 +449,7 @@ class IntBufferTest {
         byteBuffer.reset()
         byteBuffer.write(1L, byteOrder = ByteOrder.LITTLE_ENDIAN)
         byteBuffer.write(1L, byteOrder = ByteOrder.BIG_ENDIAN)
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1, readLong(byteOrder = ByteOrder.LITTLE_ENDIAN).getOrThrow())
             assertEquals(1, readLong(byteOrder = ByteOrder.BIG_ENDIAN).getOrThrow())
         }
@@ -478,7 +487,7 @@ class IntBufferTest {
         assertEquals(36, byteBuffer.position)
         assertFails { byteBuffer.write(-1L, 7) }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(0xFFL, readLong(1).getOrThrow())
             assertEquals(0xFFFFL, readLong(2).getOrThrow())
             assertEquals(0xFFFFFFL, readLong(3).getOrThrow())
@@ -522,7 +531,7 @@ class IntBufferTest {
         assertEquals(36, byteBuffer.position)
         assertFails { byteBuffer.write(-1L, 7) }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(1L, readLong(1, ByteOrder.LITTLE_ENDIAN).getOrThrow())
             assertEquals(1L, readLong(2, ByteOrder.LITTLE_ENDIAN).getOrThrow())
             assertEquals(1L, readLong(3, ByteOrder.LITTLE_ENDIAN).getOrThrow())
@@ -535,19 +544,19 @@ class IntBufferTest {
 
         byteBuffer.reset()
         byteBuffer.write(1L, 4, ByteOrder.LITTLE_ENDIAN)
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertNotEquals(1L, readLong(4, ByteOrder.BIG_ENDIAN).getOrThrow())
         }
 
         byteBuffer.reset()
         byteBuffer.write(200L)
-        assertEquals(listOf(0, 0, 0, 0, 0, 0, 0, -56), byteBuffer.toList())
+        assertEquals(listOf(0, 0, 0, 0, 0, 0, 0, 200), byteBuffer.toList())
 
     }
 
     @Test
     fun testPeekLong() {
-        val byteBuffer = IntBuffer.wrap(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2)
+        val byteBuffer = BufferImpl.wrap(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2)
         assertEquals(0, byteBuffer.position)
         assertEquals(1, byteBuffer.peekLongOrNull())
         assertEquals(1, byteBuffer.peekLong().getOrThrow())
@@ -563,23 +572,24 @@ class IntBufferTest {
 
     @Test
     fun testReadWriteByteArray() {
-        val byteBuffer = IntBuffer.empty(10)
+        val byteBuffer = BufferImpl.empty(10)
 
         byteBuffer.write(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertTrue(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).contentEquals(readByteArray(10).getOrThrow()))
+        byteBuffer.toReadBuffer().also { readBuf ->
+            val actual = readBuf.readByteArray(10).getOrThrow()
+            assertTrue(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).contentEquals(actual))
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertTrue(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).contentEquals(readByteArrayOrNull(10)))
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertTrue(byteArrayOf(0, 1, 2, 3, 4).contentEquals(readByteArray(5).getOrThrow()))
             assertTrue(byteArrayOf(5, 6, 7, 8, 9).contentEquals(readByteArray(5).getOrThrow()))
         }
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertTrue(byteArrayOf(0, 1, 2, 3, 4).contentEquals(readByteArrayOrNull(5)))
             assertTrue(byteArrayOf(5, 6, 7, 8, 9).contentEquals(readByteArrayOrNull(5)))
         }
@@ -587,38 +597,38 @@ class IntBufferTest {
 
     @Test
     fun testPeekByteArray() {
-        val byteBuffer = IntBuffer.wrap(0, 0, 0, 1, 0, 0, 0, 2)
+        val byteBuffer = BufferImpl.wrap(0, 0, 0, 1, 0, 0, 0, 2)
         assertEquals(0, byteBuffer.position)
-        assertTrue { byteArrayOf(0, 0, 0, 1).contentEquals(byteBuffer.peekByteArrayOrNull(4)) }
-        assertTrue { byteArrayOf(0, 0, 0, 1).contentEquals(byteBuffer.peekByteArray(4).getOrThrow()) }
+        assertContentEquals(byteArrayOf(0, 0, 0, 1), byteBuffer.peekByteArrayOrNull(4))
+        assertContentEquals(byteArrayOf(0, 0, 0, 1), byteBuffer.peekByteArray(4).getOrNull())
         assertEquals(0, byteBuffer.position)
 
         byteBuffer.readByteArray(4)
 
         assertEquals(4, byteBuffer.position)
-        assertTrue { byteArrayOf(0, 0, 0, 2).contentEquals(byteBuffer.peekByteArrayOrNull(4)) }
-        assertTrue { byteArrayOf(0, 0, 0, 2).contentEquals(byteBuffer.peekByteArray(4).getOrThrow()) }
+        assertContentEquals(byteArrayOf(0, 0, 0, 2), byteBuffer.peekByteArrayOrNull(4))
+        assertContentEquals(byteArrayOf(0, 0, 0, 2), byteBuffer.peekByteArray(4).getOrThrow())
         assertEquals(4, byteBuffer.position)
     }
 
     @Test
     fun testReadWriteList() {
-        val byteBuffer = IntBuffer.empty(10)
+        val byteBuffer = BufferImpl.empty(10)
 
         byteBuffer.write(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), readList(10).getOrThrow())
         }
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), readListOrNull(10))
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(listOf(0, 1, 2, 3, 4), readList(5).getOrThrow())
             assertEquals(listOf(5, 6, 7, 8, 9), readList(5).getOrThrow())
         }
-        byteBuffer.toReadListOfIntBuffer().apply {
+        byteBuffer.toReadBuffer().apply {
             assertEquals(listOf(0, 1, 2, 3, 4), readListOrNull(5))
             assertEquals(listOf(5, 6, 7, 8, 9), readListOrNull(5))
         }
@@ -626,7 +636,7 @@ class IntBufferTest {
 
     @Test
     fun testPeekList() {
-        val byteBuffer = IntBuffer.wrap(0, 0, 0, 1, 0, 0, 0, 2)
+        val byteBuffer = BufferImpl.wrap(0, 0, 0, 1, 0, 0, 0, 2)
         assertEquals(0, byteBuffer.position)
         assertEquals(listOf(0, 0, 0, 1), byteBuffer.peekList(4).getOrThrow())
         assertEquals(listOf(0, 0, 0, 1), byteBuffer.peekListOrNull(4))
@@ -642,15 +652,15 @@ class IntBufferTest {
 
     @Test
     fun testReadWriteString() {
-        val byteBuffer = IntBuffer.empty()
+        val byteBuffer = BufferImpl.empty()
         byteBuffer.write("Test")
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertEquals("Test", readString(4).getOrThrow())
+        byteBuffer.toReadBuffer().apply {
+            assertEquals(AsciiString("Test"), readString(4).getOrThrow())
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertEquals("Test", readStringOrNull(4))
+        byteBuffer.toReadBuffer().apply {
+            assertEquals(AsciiString("Test"), readStringOrNull(4))
         }
 
         val posBefore = byteBuffer.position
@@ -661,30 +671,30 @@ class IntBufferTest {
         byteBuffer.write("Test1")
         byteBuffer.write("Test2")
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertEquals("Test1", readString(5).getOrThrow())
-            assertEquals("Test2", readString(5).getOrThrow())
+        byteBuffer.toReadBuffer().apply {
+            assertEquals(AsciiString("Test1"), readString(5).getOrThrow())
+            assertEquals(AsciiString("Test2"), readString(5).getOrThrow())
         }
 
-        byteBuffer.toReadListOfIntBuffer().apply {
-            assertEquals("Test1", readStringOrNull(5))
-            assertEquals("Test2", readStringOrNull(5))
+        byteBuffer.toReadBuffer().apply {
+            assertEquals(AsciiString("Test1"), readStringOrNull(5))
+            assertEquals(AsciiString("Test2"), readStringOrNull(5))
         }
     }
 
     @Test
     fun testPeekString() {
-        val byteBuffer = IntBuffer.wrap("FOOBAR".encodeToByteArray().toListOfInt())
+        val byteBuffer = BufferImpl.wrap("FOOBAR".encodeToByteArray().toListOfInt())
         assertEquals(0, byteBuffer.position)
-        assertEquals("FOO", byteBuffer.peekStringOrNull(3))
-        assertEquals("FOO", byteBuffer.peekString(3).getOrThrow())
+        assertEquals(AsciiString("FOO"), byteBuffer.peekStringOrNull(3))
+        assertEquals(AsciiString("FOO"), byteBuffer.peekString(3).getOrThrow())
         assertEquals(0, byteBuffer.position)
 
         byteBuffer.readString(3)
 
         assertEquals(3, byteBuffer.position)
-        assertEquals("BAR", byteBuffer.peekStringOrNull(3))
-        assertEquals("BAR", byteBuffer.peekString(3).getOrThrow())
+        assertEquals(AsciiString("BAR"), byteBuffer.peekStringOrNull(3))
+        assertEquals(AsciiString("BAR"), byteBuffer.peekString(3).getOrThrow())
         assertEquals(3, byteBuffer.position)
     }
 
@@ -693,32 +703,32 @@ class IntBufferTest {
 
         // hashcode with zero-length backing array and with non-zero-length backing array the same if no data
         // written yet
-        var hc = IntBuffer.wrap(listOf()).hashCode()
-        var hc1 = IntBuffer.empty(10).hashCode()
+        var hc = BufferImpl.wrap(listOf()).hashCode()
+        var hc1 = BufferImpl.empty(10).hashCode()
         assertEquals(hc, hc1)
-        assertEquals(1, hc)
+        assertEquals(0, hc)
 
         // Empty array and array with zero byte content have different hash codes
-        hc = IntBuffer.wrap(listOf()).hashCode()
-        hc1 = IntBuffer.wrap(listOf(0)).hashCode()
+        hc = BufferImpl.wrap(listOf()).hashCode()
+        hc1 = BufferImpl.wrap(listOf(0)).hashCode()
 
         assertTrue { hc != hc1 }
 
         // different size backing array, but same written data creates same hash code
-        hc = IntBuffer.empty(20).also {
+        hc = BufferImpl.empty(20).also {
             it.write(0)
         }.hashCode()
-        hc1 = IntBuffer.empty(10).also {
+        hc1 = BufferImpl.empty(10).also {
             it.write(0)
         }.hashCode()
 
         assertEquals(hc, hc1)
 
         // same size backing array, but different written data creates different hash code
-        hc = IntBuffer.empty(10).also {
+        hc = BufferImpl.empty(10).also {
             it.write(1)
         }.hashCode()
-        hc1 = IntBuffer.empty(10).also {
+        hc1 = BufferImpl.empty(10).also {
             it.write(0)
         }.hashCode()
 
@@ -729,7 +739,7 @@ class IntBufferTest {
     @Test
     fun testReadRemaining() {
         val data = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-        val buf = IntBuffer.wrap(data)
+        val buf = BufferImpl.wrap(data)
 
         assertEquals(data, buf.readRemaining().getOrThrow())
         assertTrue { buf.readByteArray().getOrThrow().isEmpty() }
@@ -795,7 +805,7 @@ class IntBufferTest {
 
     @Test
     fun testPeekRemaining() {
-        val buf = IntBuffer.wrap(1, 2, 3, 4, 5, 6, 7, 8)
+        val buf = BufferImpl.wrap(1, 2, 3, 4, 5, 6, 7, 8)
         buf.readList(4)
 
         assertEquals(4, buf.position)
@@ -808,10 +818,10 @@ class IntBufferTest {
     @Test
     fun testHasBytesLeftToRead() {
 
-        val buf = IntBuffer.empty(10)
+        val buf = BufferImpl.empty(10)
         buf.write(listOf(0, 1, 2, 3, 4))
 
-        buf.toReadListOfIntBuffer().apply {
+        buf.toReadBuffer().apply {
             assertTrue(hasBytesLeftToRead())
             assertTrue(hasBytesLeftToRead(5))
             assertFalse(hasBytesLeftToRead(6))
@@ -821,22 +831,90 @@ class IntBufferTest {
     @Test
     fun testBytesLeftToRead() {
 
-        val buf = IntBuffer.empty(10)
+        val buf = BufferImpl.empty(10)
 
         assertEquals(10, buf.capacity)
 
         buf.write(byteArrayOf(0, 1, 2, 3))
         assertEquals(4, buf.position)
 
-        buf.toReadListOfIntBuffer().apply {
+        buf.toReadBuffer().apply {
             assertEquals(4, bytesLeftToRead())
         }
 
         buf.reset()
         assertEquals(0, buf.position)
         assertEquals(10, buf.capacity)
-        buf.toReadListOfIntBuffer().apply {
+        buf.toReadBuffer().apply {
             assertEquals(0, bytesLeftToRead())
         }
+    }
+
+    @Test
+    fun testPosWatermarkCapacity() {
+
+        val readBuf = BufferImpl.wrap(List(128) { it })
+
+        assertEquals(0, readBuf.position)
+        assertEquals(128, readBuf.watermark)
+
+        readBuf.readList(128)
+
+        assertEquals(128, readBuf.position)
+        assertEquals(128, readBuf.watermark)
+
+        readBuf.rewind()
+
+        assertEquals(0, readBuf.position)
+        assertEquals(128, readBuf.watermark)
+
+        val writeBuf = BufferImpl.empty(128)
+
+        assertEquals(0, writeBuf.position)
+        assertEquals(0, writeBuf.toReadBuffer().watermark)
+
+        writeBuf.write(List(64) { it })
+
+        assertEquals(128, writeBuf.capacity)
+        assertEquals(64, writeBuf.position)
+        assertEquals(64, writeBuf.toReadBuffer().watermark)
+
+        writeBuf.reset()
+
+        assertEquals(128, writeBuf.capacity)
+        assertEquals(0, writeBuf.position)
+        assertEquals(0, writeBuf.toReadBuffer().watermark)
+
+        writeBuf.write(List(64) { it })
+
+        assertEquals(128, writeBuf.capacity)
+        assertEquals(64, writeBuf.position)
+        assertEquals(64, writeBuf.toReadBuffer().watermark)
+
+        val readBuf1 = writeBuf.toReadBuffer()
+
+        assertEquals(0, readBuf1.position)
+        assertEquals(64, readBuf1.watermark)
+    }
+
+    @Test
+    fun testSeek() {
+
+        val readBuf = BufferImpl.wrap(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
+
+        assertEquals(1, readBuf.readByte().getOrThrow())
+
+        readBuf.seekBy(1)
+
+        assertEquals(3, readBuf.readByte().getOrThrow())
+        assertEquals(4, readBuf.readByte().getOrThrow())
+
+        readBuf.seekTo(1)
+
+        assertEquals(2, readBuf.readByte().getOrThrow())
+        assertEquals(3, readBuf.readByte().getOrThrow())
+
+
+
     }
 }

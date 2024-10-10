@@ -57,6 +57,17 @@ android {
 
 kotlin {
 
+    targets.all {
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions{
+                    // Set compiler options for all compilation targets here
+                }
+            }
+        }
+    }
+
+
     jvm().compilations.all {
         compileTaskProvider.configure{
             compilerOptions {
@@ -81,6 +92,12 @@ kotlin {
 
     sourceSets {
 
+        all {
+            languageSettings.languageVersion = "2.0"
+            languageSettings.optIn("kotlin.ExperimentalUnsignedTypes")
+            languageSettings.optIn("kotlin.ExperimentalStdlibApi")
+        }
+
         commonMain {
             dependencies{
                 implementation(libs.kotlin.coroutines)
@@ -103,6 +120,7 @@ kotlin {
         }
     }
 }
+
 
 publishing {
 
