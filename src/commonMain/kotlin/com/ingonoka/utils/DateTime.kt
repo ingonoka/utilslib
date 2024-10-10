@@ -8,6 +8,7 @@ import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.offsetIn
 
+@Suppress("SpellCheckingInspection")
 /**
  * This code was generated like this:
  *
@@ -36,17 +37,19 @@ private val dateFormat = DateTimeComponents.Format {
     offsetMinutesOfHour(Padding.ZERO)
 }
 
+@Suppress("SpellCheckingInspection")
 /**
  * Format an instant as String in [timeZone].
  *
  * The function ensures that the formatted string will always have the form `yyyy-MM-dd'T'HH:mm:ssxxx`, which means
  *
  * * if [timeZone] is UTC, then `+00:00` will be used and NOT `Z`,
- * * the year is always 4 digits padded with zero if necessary
- * * Only full seconds are considered (no rounding up!)
- * * month will always be two digits padded with a zero if necessary
- * * if [timeZone] was created with an explicit number of offset hours such as "+08:00", then summer time is not
- * considered. If created with a known timezone name such as "Europe/London", then summer time will be considered
+ * * the year is always 4 digits padded with zero if necessary,
+ * * Only full seconds are considered (no rounding up!),
+ * * month will always be two digits padded with a zero if necessary,
+ * * if the [timeZone] was created with an explicit number of offset hours such as "+08:00", then Summer Time is not,
+ * considered.
+ * If created with a known timezone name such as "Europe/London", then Summer Time will be considered
  */
 fun Instant.formatTime(timeZone: TimeZone): String = format(dateFormat, offsetIn(timeZone))
 

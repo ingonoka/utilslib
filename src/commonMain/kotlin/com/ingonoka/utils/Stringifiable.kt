@@ -14,7 +14,7 @@ package com.ingonoka.utils
  */
 interface Stringifiable {
     /**
-     * Printable string describing the stringifiable object.
+     * Printable string describing the "stringifiable" object.
      *
      * if [short] is true (default) then the string will be shorter and contain less verbose information.
      */

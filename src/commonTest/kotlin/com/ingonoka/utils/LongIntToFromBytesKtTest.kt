@@ -158,52 +158,52 @@ class LongIntToFromBytesKtTest {
     @Test
     fun testReadLongNoLeadingZeros() {
 
-        IntBuffer.wrap(byteArrayOf()).readLongNoLeadingZeros(1).onFailure {
+        BufferImpl.wrap(byteArrayOf()).readLongNoLeadingZeros(1).onFailure {
             assertTrue { it.message?.contains("ByteArray Empty") ?: false }
         }
         assertEquals(
             128L,
-            IntBuffer.wrap(byteArrayOf(0x80.toByte())).readLongNoLeadingZeros(1).getOrThrow()
+            BufferImpl.wrap(byteArrayOf(0x80.toByte())).readLongNoLeadingZeros(1).getOrThrow()
         )
         assertEquals(
             128L,
-            IntBuffer.wrap(byteArrayOf(0x80.toByte())).readLongNoLeadingZeros(2).getOrThrow()
+            BufferImpl.wrap(byteArrayOf(0x80.toByte())).readLongNoLeadingZeros(2).getOrThrow()
         )
 
         assertEquals(
             -9223372036854775807L - 1L,
-            IntBuffer.wrap("8000000000000000".hexToBytes()).readLongNoLeadingZeros(8).getOrThrow()
+            BufferImpl.wrap("8000000000000000".hexToBytes()).readLongNoLeadingZeros(8).getOrThrow()
         )
         assertEquals(
             -1L,
-            IntBuffer.wrap("FFFFFFFFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(8).getOrThrow()
+            BufferImpl.wrap("FFFFFFFFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(8).getOrThrow()
         )
         assertEquals(
             Long.MAX_VALUE,
-            IntBuffer.wrap("7FFFFFFFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(8).getOrThrow()
+            BufferImpl.wrap("7FFFFFFFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(8).getOrThrow()
         )
         assertEquals(
             72057594037927935,
-            IntBuffer.wrap("FFFFFFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(7).getOrThrow()
+            BufferImpl.wrap("FFFFFFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(7).getOrThrow()
         )
         assertEquals(
             281474976710655,
-            IntBuffer.wrap("FFFFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(6).getOrThrow()
+            BufferImpl.wrap("FFFFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(6).getOrThrow()
         )
         assertEquals(
             1099511627775,
-            IntBuffer.wrap("FFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(5).getOrThrow()
+            BufferImpl.wrap("FFFFFFFFFF".hexToBytes()).readLongNoLeadingZeros(5).getOrThrow()
         )
         assertEquals(
             4294967295,
-            IntBuffer.wrap("FFFFFFFF".hexToBytes()).readLongNoLeadingZeros(4).getOrThrow()
+            BufferImpl.wrap("FFFFFFFF".hexToBytes()).readLongNoLeadingZeros(4).getOrThrow()
         )
         assertEquals(
             16777215,
-            IntBuffer.wrap("FFFFFF".hexToBytes()).readLongNoLeadingZeros(3).getOrThrow()
+            BufferImpl.wrap("FFFFFF".hexToBytes()).readLongNoLeadingZeros(3).getOrThrow()
         )
-        assertEquals(65535, IntBuffer.wrap("FFFF".hexToBytes()).readLongNoLeadingZeros(2).getOrThrow())
-        assertEquals(255, IntBuffer.wrap("FF".hexToBytes()).readLongNoLeadingZeros(1).getOrThrow())
+        assertEquals(65535, BufferImpl.wrap("FFFF".hexToBytes()).readLongNoLeadingZeros(2).getOrThrow())
+        assertEquals(255, BufferImpl.wrap("FF".hexToBytes()).readLongNoLeadingZeros(1).getOrThrow())
 
 
     }
@@ -373,57 +373,49 @@ class LongIntToFromBytesKtTest {
     fun testReadIntNoLeadingZeros() {
 
 
-        assertFails { IntBuffer.wrap(byteArrayOf()).readIntNoLeadingZeros(1).getOrThrow() }
+        assertFails { BufferImpl.wrap(byteArrayOf()).readIntNoLeadingZeros(1).getOrThrow() }
             .message?.contains("ByteArray Empty") ?: false
 
         assertEquals(
             128,
-            IntBuffer.wrap(byteArrayOf(0x80.toByte()))
-                .rewind()
+            BufferImpl.wrap(byteArrayOf(0x80.toByte()))
                 .readIntNoLeadingZeros(1).getOrThrow()
         )
         assertEquals(
             128,
-            IntBuffer.wrap(byteArrayOf(0x80.toByte()))
-                .rewind()
+            BufferImpl.wrap(byteArrayOf(0x80.toByte()))
                 .readIntNoLeadingZeros(2).getOrThrow()
         )
 
         assertEquals(
             -2147483648,
-            IntBuffer.wrap("80000000".hexToBytes())
-                .rewind()
+            BufferImpl.wrap("80000000".hexToBytes())
                 .readIntNoLeadingZeros(4).getOrThrow()
         )
         assertEquals(
             -1,
-            IntBuffer.wrap("FFFFFFFF".hexToBytes())
-                .rewind()
+            BufferImpl.wrap("FFFFFFFF".hexToBytes())
                 .readIntNoLeadingZeros(4).getOrThrow()
         )
 
         assertEquals(
             Int.MAX_VALUE,
-            IntBuffer.wrap("7FFFFFFF".hexToBytes())
-                .rewind()
+            BufferImpl.wrap("7FFFFFFF".hexToBytes())
                 .readIntNoLeadingZeros(4).getOrThrow()
         )
         assertEquals(
             16777215,
-            IntBuffer.wrap("FFFFFF".hexToBytes())
-                .rewind()
+            BufferImpl.wrap("FFFFFF".hexToBytes())
                 .readIntNoLeadingZeros(3).getOrThrow()
         )
         assertEquals(
             65535,
-            IntBuffer.wrap("FFFF".hexToBytes())
-                .rewind()
+            BufferImpl.wrap("FFFF".hexToBytes())
                 .readIntNoLeadingZeros(2).getOrThrow()
         )
         assertEquals(
             255,
-            IntBuffer.wrap("FF".hexToBytes())
-                .rewind()
+            BufferImpl.wrap("FF".hexToBytes())
                 .readIntNoLeadingZeros(1).getOrThrow()
         )
 

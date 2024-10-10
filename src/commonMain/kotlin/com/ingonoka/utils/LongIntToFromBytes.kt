@@ -363,7 +363,7 @@ fun ByteArray.toLong(index: Int = 0): Result<Long> =
  *
  * @see ByteArray.toLongNoLeadingZeros
  */
-fun ReadIntBuffer.readLongNoLeadingZeros(n: Int = -1): Result<Long> = try {
+fun ReadBuffer.readLongNoLeadingZeros(n: Int = -1): Result<Long> = try {
 
     val remaining = this.bytesLeftToRead()
 
@@ -383,7 +383,7 @@ fun ReadIntBuffer.readLongNoLeadingZeros(n: Int = -1): Result<Long> = try {
  *
  *
  */
-fun ReadIntBuffer.readIntNoLeadingZeros(n: Int): Result<Int> = readLongNoLeadingZeros(n).map { it.toInt() }
+fun ReadBuffer.readIntNoLeadingZeros(n: Int): Result<Int> = readLongNoLeadingZeros(n).map { it.toInt() }
 
 
 /**

@@ -12,7 +12,7 @@ The `utils` library provides functions that are commonly used across all project
 == Usage
 
 === Base64
-Very fast BASE64 encoding functions based on lookup tables.
+Fast BASE64 encoding functions based on lookup tables.
 
 |====
 |Function|Purpose
@@ -35,7 +35,6 @@ Very fast BASE64 encoding functions based on lookup tables.
 
 |`ByteArray.fromBase64(): ByteArray`
 | Convert the bytes in a `ByteArray` to a Base64 string
-|
 |====
 
 === Logger
@@ -52,8 +51,8 @@ Interpret a String as a duration description and convert into number of seconds 
 
 - "PT15S"     -- parses as "15 Seconds"
 - "PT15M"     -- parses as "15 minutes" (where a minute is 60 seconds)
-- "PT10H"     -- parses as "10 hours" (where an hour is 3600 seconds)
-- "P2D"       -- parses as "2 days" (where a day is 24 hours or 86400 seconds)
+- "PT10H"     -- parses as "10 hours" (one hour is 3600 seconds)
+- "P2D"       -- parses as "2 days" (one day is 24 hours or 86,400 seconds)
 - "P2DT3H4M"  -- parses as "2 days, 3 hours and 4 minutes"
 
 === Initialize a Variable Thread-Safe
@@ -91,8 +90,8 @@ listOf(7, 9, 9, 2, 7, 3, 9, 8, 7, 1, 3).validateLuhnChecksum() // is true
 Works like a `ByteBuffer` backed by a `ByteArray`.
 
 - If the data to be written to the buffer does not fit into the underlying byte array, then the array will be extended.
-- The buffer capacity will be increased by multiples of the initial size of the buffer.  For example, writing 129 bytes to a buffer that is 128 bytes long will result in a buffer with a capacity of 256 bytes.
-- Rewinding the buffer results in a truncation of the underlying byte array to the actual size of the content, i.e. the size of the underlying byte array will potentially not be a multiple of the initial size anymore.
+- The buffer capacity will be increased by multiples of the initial buffer size.  For example, writing 129 bytes to a buffer that is 128 bytes long will result in a buffer with a capacity of 256 bytes.
+- Rewinding the buffer results in a truncation of the underlying byte array to the actual size of the content, i.e., the size of the underlying byte array will potentially not be a multiple of the initial size anymore.
 - An attempt to read data from the buffer for which there are not enough bytes will result in a SingleResult.Failure response.
 +
 [source,kotlin]
@@ -107,7 +106,7 @@ val hb: HeartBeat = buf.readByteArray(buf.size).map {
     HeartBeat.parseFrom(it)
 }.materialize { throw it }
 ----
-- Reading and writing of Int and Long takes 4 and 8 bytes and is ordered in big endian notation
+- Reading and writing of Int and Long takes four and eight bytes and is ordered in big endian notation
 
 === Single Result
 

@@ -11,7 +11,7 @@ package com.ingonoka.utils
 
 
 /**
- * Helper function to build bytearray using an [WriteIntBuffer].
+ * Helper function to build bytearray using an [WriteBuffer].
  *
  * Usage:
  * ```
@@ -21,12 +21,12 @@ package com.ingonoka.utils
  * }.materialize { throw it }
  * ```
  */
-fun buildByteArray(builder: WriteIntBuffer.() -> Unit): Result<List<Int>> =
+fun buildByteArray(builder: WriteBuffer.() -> Unit): Result<List<Int>> =
     try {
         Result.success(
-            IntBuffer.empty().apply {
+            BufferImpl.empty().apply {
                 builder()
-            }.toReadListOfIntBuffer().readRemaining().getOrThrow()
+            }.toReadBuffer().readRemaining().getOrThrow()
         )
     } catch (e: Exception) {
         Result.failure(Exception("Building byte array failed", e))

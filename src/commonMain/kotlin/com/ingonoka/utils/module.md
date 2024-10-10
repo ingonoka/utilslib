@@ -48,7 +48,7 @@ Manager.instance(context) // parameter will be ignored if initialzed already
 
 ## Base64
 
-Convert from Base64 string to byte-array
+Convert from Base64 string to a byte-array
 ```kotlin
 "Zg==".decodeFromBase64() // [ 102 ]
 ```
