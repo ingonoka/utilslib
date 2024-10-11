@@ -10,6 +10,24 @@ import kotlin.test.assertFailsWith
 class UByteExtTest {
 
     @Test
+    fun testInline() {
+
+        assertEquals((-1).toByte(), 0xff.b)
+        assertEquals((-128).toByte(), (-128).b)
+        assertEquals(127.toByte(), (-129).b)
+        assertEquals(127.toByte(), 127.b)
+        assertEquals((-128).toByte(), 128.b)
+
+        assertEquals(-1, 0xff.bi)
+        assertEquals(-128, (-128).bi)
+        assertEquals(127, (-129).bi)
+        assertEquals(127, 127.bi)
+        assertEquals(-128, 128.bi)
+
+
+
+    }
+    @Test
     fun testUIntToUBytes() {
 
         assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u), 0u.toUBytes(4))
