@@ -3,6 +3,8 @@ package com.ingonoka.utils
 import com.ingonoka.utils.ByteOrder.BIG_ENDIAN
 import com.ingonoka.utils.ByteOrder.LITTLE_ENDIAN
 
+inline val Int.b: Byte get()= toInt().toByte()
+
 fun UInt.toUBytes(
     length: Int = UInt.SIZE_BYTES,
     byteOrder: ByteOrder = BIG_ENDIAN,
@@ -29,6 +31,16 @@ fun UInt.toUBytes(
     }
     return ba
 }
+
+fun Long.toUBytes(
+    length: Int = Long.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN
+): UByteArray  = toULong().toUBytes(length, byteOrder)
+
+fun Long.toBytes(
+    length: Int = Long.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN
+): ByteArray  = toULong().toBytes(length, byteOrder)
 
 fun ULong.toUBytes(
     length: Int = ULong.SIZE_BYTES,
@@ -57,6 +69,11 @@ fun ULong.toUBytes(
     }
     return ba
 }
+
+fun ULong.toBytes(
+    length: Int = ULong.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN
+): ByteArray = toUBytes(length, byteOrder).toByteArray()
 
 fun UByteArray.toUInt(
     offset: Int = 0,

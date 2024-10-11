@@ -10,7 +10,7 @@ import kotlin.test.assertFailsWith
 class UByteExtTest {
 
     @Test
-    fun testUIntToBytes() {
+    fun testUIntToUBytes() {
 
         assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u), 0u.toUBytes(4))
         assertContentEquals(ubyteArrayOf(0u, 0u, 0u), 0u.toUBytes(3))
@@ -62,7 +62,7 @@ class UByteExtTest {
     }
 
     @Test
-    fun testULongToBytes() {
+    fun testULongToUBytes() {
 
         assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u), 0uL.toUBytes(8))
         assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u), 0uL.toUBytes(4))
@@ -124,6 +124,204 @@ class UByteExtTest {
         )
 
         assertFailsWith<IllegalArgumentException> { 0xff000000uL.toUBytes(3) }
+
+    }
+
+    @Test
+    fun testULongToBytes() {
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0), 0uL.toBytes(8))
+        assertContentEquals(byteArrayOf(0, 0, 0, 0), 0uL.toBytes(4))
+        assertContentEquals(byteArrayOf(0, 0, 0), 0uL.toBytes(3))
+        assertContentEquals(byteArrayOf(0, 0), 0uL.toBytes(2))
+        assertContentEquals(byteArrayOf(0), 0uL.toBytes(1))
+        assertContentEquals(byteArrayOf(0), 0uL.toBytes(0))
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0xff.b), 0xffuL.toBytes(8))
+        assertContentEquals(byteArrayOf(0, 0, 0, 0xff.b), 0xffuL.toBytes(4))
+        assertContentEquals(byteArrayOf(0, 0, 0xff.b), 0xffuL.toBytes(3))
+        assertContentEquals(byteArrayOf(0, 0xff.b), 0xffuL.toBytes(2))
+        assertContentEquals(byteArrayOf(0xff.b), 0xffuL.toBytes(1))
+        assertContentEquals(byteArrayOf(0xff.b), 0xffuL.toBytes(0))
+
+        assertContentEquals(byteArrayOf(0xff.b, 0, 0, 0, 0, 0, 0, 0), 0xffuL.toBytes(8, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b, 0, 0, 0x0), 0xffuL.toBytes(4, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b, 0, 0), 0xffuL.toBytes(3, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b, 0), 0xffuL.toBytes(2, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b), 0xffuL.toBytes(1, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b), 0xffuL.toBytes(0, LITTLE_ENDIAN))
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0xff.b, 0xff.b), 0xffffuL.toBytes(8))
+        assertContentEquals(byteArrayOf(0, 0, 0xff.b, 0xff.b), 0xffffuL.toBytes(4))
+        assertContentEquals(byteArrayOf(0, 0xff.b, 0xff.b), 0xffffuL.toBytes(3))
+        assertContentEquals(byteArrayOf(0xff.b, 0xff.b), 0xffffuL.toBytes(2))
+        assertFailsWith<IllegalArgumentException> { 0xffffuL.toBytes(1) }
+        assertContentEquals(byteArrayOf(0xff.b, 0xff.b), 0xffffuL.toBytes(0))
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 2, 1), 0x0201uL.toBytes(8))
+        assertContentEquals(byteArrayOf(0, 0, 2, 0x1), 0x0201uL.toBytes(4))
+        assertContentEquals(byteArrayOf(0, 0x02, 0x01), 0x0201uL.toBytes(3))
+        assertContentEquals(byteArrayOf(0x02, 0x01), 0x0201uL.toBytes(2))
+        assertFailsWith<IllegalArgumentException> { 0x0201uL.toBytes(1) }
+        assertContentEquals(byteArrayOf(0x02, 0x01), 0x0201uL.toBytes(0))
+
+        assertContentEquals(byteArrayOf(1, 2, 0, 0, 0, 0, 0, 0), 0x0201uL.toBytes(8, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0x01, 0x02, 0, 0x0), 0x0201uL.toBytes(4, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0x01, 0x02, 0), 0x0201uL.toBytes(3, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0x01, 0x02), 0x0201uL.toBytes(2, LITTLE_ENDIAN))
+        assertFailsWith<IllegalArgumentException> { 0x0201uL.toBytes(1) }
+        assertContentEquals(byteArrayOf(0x01, 0x02), 0x0201uL.toBytes(0, LITTLE_ENDIAN))
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0xff.b), 0xffuL.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0x7F), 127uL.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0xff.b, 0, 0, 0), 0xff000000uL.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0xff.b, 0xff.b), 0xffffuL.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0xff.b), 0xffuL.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0xff.b, 0xff.b, 0xff.b, 0xff.b), 0xffffffffuL.toBytes())
+
+        assertContentEquals(byteArrayOf(0xff.b), 0xffuL.toBytes(0))
+        assertContentEquals(byteArrayOf(0x7F), 127uL.toBytes(0))
+        assertContentEquals(byteArrayOf(0xff.b, 0, 0, 0), 0xff000000uL.toBytes(0))
+        assertContentEquals(byteArrayOf(0xff.b, 0xff.b), 0xffffuL.toBytes(0))
+        assertContentEquals(byteArrayOf(0xff.b, 0xff.b, 0xff.b, 0xff.b), 0xffffffffuL.toBytes(0))
+        assertContentEquals(
+            byteArrayOf(0xff.b, 0xff.b, 0xff.b, 0xff.b, 0xff.b, 0xff.b, 0xff.b, 0xff.b),
+            0xffffffffffffffffuL.toBytes(0)
+        )
+
+        assertFailsWith<IllegalArgumentException> { 0xff000000uL.toBytes(3) }
+
+    }
+
+    @Test
+    fun testLongToUBytes() {
+
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u), 0L.toUBytes(8))
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u), 0L.toUBytes(4))
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u), 0L.toUBytes(3))
+        assertContentEquals(ubyteArrayOf(0u, 0u), 0L.toUBytes(2))
+        assertContentEquals(ubyteArrayOf(0u), 0L.toUBytes(1))
+        assertContentEquals(ubyteArrayOf(0u), 0L.toUBytes(0))
+
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0xffu), 0xffL.toUBytes(8))
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0xffu), 0xffL.toUBytes(4))
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0xffu), 0xffL.toUBytes(3))
+        assertContentEquals(ubyteArrayOf(0u, 0xffu), 0xffL.toUBytes(2))
+        assertContentEquals(ubyteArrayOf(0xffu), 0xffL.toUBytes(1))
+        assertContentEquals(ubyteArrayOf(0xffu), 0xffL.toUBytes(0))
+
+        assertContentEquals(ubyteArrayOf(0xffu, 0u, 0u, 0u, 0u, 0u, 0u, 0u), 0xffL.toUBytes(8, LITTLE_ENDIAN))
+        assertContentEquals(ubyteArrayOf(0xffu, 0u, 0u, 0x0u), 0xffL.toUBytes(4, LITTLE_ENDIAN))
+        assertContentEquals(ubyteArrayOf(0xffu, 0u, 0u), 0xffL.toUBytes(3, LITTLE_ENDIAN))
+        assertContentEquals(ubyteArrayOf(0xffu, 0u), 0xffL.toUBytes(2, LITTLE_ENDIAN))
+        assertContentEquals(ubyteArrayOf(0xffu), 0xffL.toUBytes(1, LITTLE_ENDIAN))
+        assertContentEquals(ubyteArrayOf(0xffu), 0xffL.toUBytes(0, LITTLE_ENDIAN))
+
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0xffu, 0xffu), 0xffffL.toUBytes(8))
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0xffu, 0xffu), 0xffffL.toUBytes(4))
+        assertContentEquals(ubyteArrayOf(0u, 0xffu, 0xffu), 0xffffL.toUBytes(3))
+        assertContentEquals(ubyteArrayOf(0xffu, 0xffu), 0xffffL.toUBytes(2))
+        assertFailsWith<IllegalArgumentException> { 0xffffL.toUBytes(1) }
+        assertContentEquals(ubyteArrayOf(0xffu, 0xffu), 0xffffL.toUBytes(0))
+
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 2u, 1u), 0x0201L.toUBytes(8))
+        assertContentEquals(ubyteArrayOf(0u, 0u, 2u, 0x1u), 0x0201L.toUBytes(4))
+        assertContentEquals(ubyteArrayOf(0u, 0x02u, 0x01u), 0x0201L.toUBytes(3))
+        assertContentEquals(ubyteArrayOf(0x02u, 0x01u), 0x0201L.toUBytes(2))
+        assertFailsWith<IllegalArgumentException> { 0x0201L.toUBytes(1) }
+        assertContentEquals(ubyteArrayOf(0x02u, 0x01u), 0x0201L.toUBytes(0))
+
+        assertContentEquals(ubyteArrayOf(1u, 2u, 0u, 0u, 0u, 0u, 0u, 0u), 0x0201L.toUBytes(8, LITTLE_ENDIAN))
+        assertContentEquals(ubyteArrayOf(0x01u, 0x02u, 0u, 0x0u), 0x0201L.toUBytes(4, LITTLE_ENDIAN))
+        assertContentEquals(ubyteArrayOf(0x01u, 0x02u, 0u), 0x0201L.toUBytes(3, LITTLE_ENDIAN))
+        assertContentEquals(ubyteArrayOf(0x01u, 0x02u), 0x0201L.toUBytes(2, LITTLE_ENDIAN))
+        assertFailsWith<IllegalArgumentException> { 0x0201L.toUBytes(1) }
+        assertContentEquals(ubyteArrayOf(0x01u, 0x02u), 0x0201L.toUBytes(0, LITTLE_ENDIAN))
+
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0xffu), 0xffL.toUBytes())
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0x7Fu), 127L.toUBytes())
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0xffu, 0u, 0u, 0u), 0xff000000L.toUBytes())
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0xffu, 0xffu), 0xffffL.toUBytes())
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0xffu), 0xffL.toUBytes())
+        assertContentEquals(ubyteArrayOf(0u, 0u, 0u, 0u, 0xffu, 0xffu, 0xffu, 0xffu), 0xffffffffL.toUBytes())
+
+        assertContentEquals(ubyteArrayOf(0xffu), 0xffL.toUBytes(0))
+        assertContentEquals(ubyteArrayOf(0x7Fu), 127L.toUBytes(0))
+        assertContentEquals(ubyteArrayOf(0xffu, 0u, 0u, 0u), 0xff000000L.toUBytes(0))
+        assertContentEquals(ubyteArrayOf(0xffu, 0xffu), 0xffffL.toUBytes(0))
+        assertContentEquals(ubyteArrayOf(0xffu, 0xffu, 0xffu, 0xffu), 0xffffffffL.toUBytes(0))
+        assertContentEquals(
+            ubyteArrayOf(0xffu, 0xffu, 0xffu, 0xffu, 0xffu, 0xffu, 0xffu, 0xffu),
+            (-1L).toUBytes(0)
+        )
+
+        assertFailsWith<IllegalArgumentException> { 0xff000000L.toUBytes(3) }
+
+    }
+
+  @Test
+    fun testLongToBytes() {
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0), 0L.toBytes(8))
+        assertContentEquals(byteArrayOf(0, 0, 0, 0), 0L.toBytes(4))
+        assertContentEquals(byteArrayOf(0, 0, 0), 0L.toBytes(3))
+        assertContentEquals(byteArrayOf(0, 0), 0L.toBytes(2))
+        assertContentEquals(byteArrayOf(0), 0L.toBytes(1))
+        assertContentEquals(byteArrayOf(0), 0L.toBytes(0))
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0xff.b), 0xffL.toBytes(8))
+        assertContentEquals(byteArrayOf(0, 0, 0, 0xff.b), 0xffL.toBytes(4))
+        assertContentEquals(byteArrayOf(0, 0, 0xff.b), 0xffL.toBytes(3))
+        assertContentEquals(byteArrayOf(0, 0xff.b), 0xffL.toBytes(2))
+        assertContentEquals(byteArrayOf(0xff.b), 0xffL.toBytes(1))
+        assertContentEquals(byteArrayOf(0xff.b), 0xffL.toBytes(0))
+
+        assertContentEquals(byteArrayOf(0xff.b, 0, 0, 0, 0, 0, 0, 0), 0xffL.toBytes(8, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b, 0, 0, 0x0), 0xffL.toBytes(4, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b, 0, 0), 0xffL.toBytes(3, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b, 0), 0xffL.toBytes(2, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b), 0xffL.toBytes(1, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0xff.b), 0xffL.toBytes(0, LITTLE_ENDIAN))
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0xff.b, 0xff.b), 0xffffL.toBytes(8))
+        assertContentEquals(byteArrayOf(0, 0, 0xff.b, 0xff.b), 0xffffL.toBytes(4))
+        assertContentEquals(byteArrayOf(0, 0xff.b, 0xff.b), 0xffffL.toBytes(3))
+        assertContentEquals(byteArrayOf(0xff.b, 0xff.b), 0xffffL.toBytes(2))
+        assertFailsWith<IllegalArgumentException> { 0xffffL.toBytes(1) }
+        assertContentEquals(byteArrayOf(0xff.b, 0xff.b), 0xffffL.toBytes(0))
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 2, 1), 0x0201L.toBytes(8))
+        assertContentEquals(byteArrayOf(0, 0, 2, 0x1), 0x0201L.toBytes(4))
+        assertContentEquals(byteArrayOf(0, 0x02, 0x01), 0x0201L.toBytes(3))
+        assertContentEquals(byteArrayOf(0x02, 0x01), 0x0201L.toBytes(2))
+        assertFailsWith<IllegalArgumentException> { 0x0201L.toBytes(1) }
+        assertContentEquals(byteArrayOf(0x02, 0x01), 0x0201L.toBytes(0))
+
+        assertContentEquals(byteArrayOf(1, 2, 0, 0, 0, 0, 0, 0), 0x0201L.toBytes(8, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0x01, 0x02, 0, 0x0), 0x0201L.toBytes(4, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0x01, 0x02, 0), 0x0201L.toBytes(3, LITTLE_ENDIAN))
+        assertContentEquals(byteArrayOf(0x01, 0x02), 0x0201L.toBytes(2, LITTLE_ENDIAN))
+        assertFailsWith<IllegalArgumentException> { 0x0201L.toBytes(1) }
+        assertContentEquals(byteArrayOf(0x01, 0x02), 0x0201L.toBytes(0, LITTLE_ENDIAN))
+
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0xff.b), 0xffL.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0x7F), 127L.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0xff.b, 0, 0, 0), 0xff000000L.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0xff.b, 0xff.b), 0xffffL.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0xff.b), 0xffL.toBytes())
+        assertContentEquals(byteArrayOf(0, 0, 0, 0, 0xff.b, 0xff.b, 0xff.b, 0xff.b), 0xffffffffL.toBytes())
+
+        assertContentEquals(byteArrayOf(0xff.b), 0xffL.toBytes(0))
+        assertContentEquals(byteArrayOf(0x7F), 127L.toBytes(0))
+        assertContentEquals(byteArrayOf(0xff.b, 0, 0, 0), 0xff000000L.toBytes(0))
+        assertContentEquals(byteArrayOf(0xff.b, 0xff.b), 0xffffL.toBytes(0))
+        assertContentEquals(byteArrayOf(0xff.b, 0xff.b, 0xff.b, 0xff.b), 0xffffffffL.toBytes(0))
+        assertContentEquals(
+            byteArrayOf(0xff.b, 0xff.b, 0xff.b, 0xff.b, 0xff.b, 0xff.b, 0xff.b, 0xff.b),
+            (-1L).toBytes(0)
+        )
+
+        assertFailsWith<IllegalArgumentException> { 0xff000000L.toBytes(3) }
 
     }
 
