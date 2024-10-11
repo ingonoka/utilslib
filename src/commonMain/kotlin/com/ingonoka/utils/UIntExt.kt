@@ -3,7 +3,8 @@ package com.ingonoka.utils
 import com.ingonoka.utils.ByteOrder.BIG_ENDIAN
 import com.ingonoka.utils.ByteOrder.LITTLE_ENDIAN
 
-inline val Int.b: Byte get()= toInt().toByte()
+inline val Int.b: Byte get()= toByte()
+inline val Int.bi: Int get()= toByte().toInt()
 
 fun UInt.toUBytes(
     length: Int = UInt.SIZE_BYTES,
