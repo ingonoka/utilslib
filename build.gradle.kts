@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.mavenPublish)
     alias(libs.plugins.dokkaGradlePlugin)
     alias(libs.plugins.asciiDocGradlePlugin)
@@ -60,7 +61,7 @@ kotlin {
     targets.all {
         compilations.all {
             compileTaskProvider.configure {
-                compilerOptions{
+                compilerOptions {
                     // Set compiler options for all compilation targets here
                 }
             }
@@ -69,7 +70,7 @@ kotlin {
 
 
     jvm().compilations.all {
-        compileTaskProvider.configure{
+        compileTaskProvider.configure {
             compilerOptions {
                 jvmTarget.set(JvmTarget.valueOf(libs.versions.jvm.target.get()))
             }
@@ -82,7 +83,7 @@ kotlin {
         publishLibraryVariants("release", "debug")
 
         compilations.all {
-            compileTaskProvider.configure{
+            compileTaskProvider.configure {
                 compilerOptions {
                     jvmTarget.set(JvmTarget.valueOf(libs.versions.jvm.target.get()))
                 }
@@ -99,9 +100,10 @@ kotlin {
         }
 
         commonMain {
-            dependencies{
+            dependencies {
                 implementation(libs.kotlin.coroutines)
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.serialization.core)
             }
         }
 
@@ -110,6 +112,8 @@ kotlin {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlin.coroutines.test)
                 implementation(libs.ingonoka.hexutils)
+                implementation(libs.kotlinx.serialization.protobuf)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
 

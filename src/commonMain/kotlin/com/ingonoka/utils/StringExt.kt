@@ -1,5 +1,6 @@
 package com.ingonoka.utils
 
+import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
 enum class TextAlignment { ALIGN_LEFT, ALIGN_RIGHT }
@@ -62,6 +63,7 @@ val asciiPrintableCode = mapOf(
  * Inline value class wrapping a [String].  Class ensures that string
  * only contains characters in the printable ASCII range between 0x20 to 0x7E
  */
+@Serializable
 @JvmInline
 value class AsciiString(val s: String) {
 
