@@ -3,8 +3,14 @@ package com.ingonoka.utils
 import com.ingonoka.utils.ByteOrder.BIG_ENDIAN
 import com.ingonoka.utils.ByteOrder.LITTLE_ENDIAN
 
-inline val Int.b: Byte get()= toByte()
-inline val Int.bi: Int get()= toByte().toInt()
+inline val Int.b: Byte get() = toByte()
+inline val Int.bi: Int get() = toByte().toInt()
+inline val Byte.ui: Int get() = toInt() and 0xFF
+
+fun UInt.toIntBytes(
+    length: Int = UInt.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN,
+): List<Int> = toUBytes(length, byteOrder).map { it.toInt() }
 
 fun UInt.toUBytes(
     length: Int = UInt.SIZE_BYTES,
@@ -33,20 +39,103 @@ fun UInt.toUBytes(
     return ba
 }
 
+fun UInt.toBytes(
+    length: Int = UInt.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN,
+): ByteArray {
+
+    require(length in 0..UInt.SIZE_BYTES)
+
+    // The minimum number of bytes needed to encode this integer
+    val minBytes = (UInt.SIZE_BYTES - (this.countLeadingZeroBits() / 8)).takeIf { it != 0 } ?: 1
+    require(length == 0 || length >= minBytes)
+
+    val baLength = if (length == 0) minBytes else length
+
+    val ba = ByteArray(baLength)
+
+    when (byteOrder) {
+        BIG_ENDIAN -> {
+            for (i in 0 until baLength) ba[i] = (this shr (baLength - i - 1) * 8).toByte()
+        }
+
+        LITTLE_ENDIAN -> {
+            for (i in baLength - 1 downTo 0) ba[i] = (this shr i * 8).toByte()
+        }
+    }
+    return ba
+}
+
+fun Int.toIntBytes(
+    length: Int = UInt.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN,
+): List<Int> = toUBytes(length, byteOrder).map { it.toInt() }
+
+fun Int.toUBytes(
+    length: Int = UInt.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN,
+): UByteArray {
+
+    require(length in 0..UInt.SIZE_BYTES)
+
+    // The minimum number of bytes needed to encode this integer
+    val minBytes = (UInt.SIZE_BYTES - (this.countLeadingZeroBits() / 8)).takeIf { it != 0 } ?: 1
+    require(length == 0 || length >= minBytes)
+
+    val baLength = if (length == 0) minBytes else length
+
+    val ba = UByteArray(baLength)
+
+    when (byteOrder) {
+        BIG_ENDIAN -> {
+            for (i in 0 until baLength) ba[i] = (this shr (baLength - i - 1) * 8).toUByte()
+        }
+
+        LITTLE_ENDIAN -> {
+            for (i in baLength - 1 downTo 0) ba[i] = (this shr i * 8).toUByte()
+        }
+    }
+    return ba
+}
+
+fun Int.toBytes(
+    length: Int = UInt.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN,
+): ByteArray {
+
+    require(length in 0..UInt.SIZE_BYTES)
+
+    // The minimum number of bytes needed to encode this integer
+    val minBytes = (UInt.SIZE_BYTES - (this.countLeadingZeroBits() / 8)).takeIf { it != 0 } ?: 1
+    require(length == 0 || length >= minBytes)
+
+    val baLength = if (length == 0) minBytes else length
+
+    val ba = ByteArray(baLength)
+
+    when (byteOrder) {
+        BIG_ENDIAN -> {
+            for (i in 0 until baLength) ba[i] = (this shr (baLength - i - 1) * 8).toByte()
+        }
+
+        LITTLE_ENDIAN -> {
+            for (i in baLength - 1 downTo 0) ba[i] = (this shr i * 8).toByte()
+        }
+    }
+    return ba
+}
+
 fun Long.toUBytes(
     length: Int = Long.SIZE_BYTES,
     byteOrder: ByteOrder = BIG_ENDIAN
-): UByteArray  = toULong().toUBytes(length, byteOrder)
+): UByteArray = toULong().toUBytes(length, byteOrder)
 
 fun Long.toBytes(
     length: Int = Long.SIZE_BYTES,
     byteOrder: ByteOrder = BIG_ENDIAN
-): ByteArray  = toULong().toBytes(length, byteOrder)
+): ByteArray = toULong().toBytes(length, byteOrder)
 
-fun ULong.toUBytes(
-    length: Int = ULong.SIZE_BYTES,
-    byteOrder: ByteOrder = BIG_ENDIAN,
-): UByteArray {
+fun ULong.toUBytes(length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): UByteArray {
 
     require(length in 0..ULong.SIZE_BYTES)
 
@@ -71,10 +160,8 @@ fun ULong.toUBytes(
     return ba
 }
 
-fun ULong.toBytes(
-    length: Int = ULong.SIZE_BYTES,
-    byteOrder: ByteOrder = BIG_ENDIAN
-): ByteArray = toUBytes(length, byteOrder).toByteArray()
+fun ULong.toBytes(length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): ByteArray =
+    toUBytes(length, byteOrder).toByteArray()
 
 fun UByteArray.toUInt(
     offset: Int = 0,
