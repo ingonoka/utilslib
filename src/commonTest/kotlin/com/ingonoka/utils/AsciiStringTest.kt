@@ -7,6 +7,7 @@ import kotlinx.serialization.protobuf.ProtoBuf
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class AsciiStringTest {
 
@@ -20,8 +21,8 @@ class AsciiStringTest {
         val t = Test(AsciiString("A"))
         val ba = "0a0141".hexToBytes()
         val json = "{\"s\":\"A\"}"
-        assertContentEquals( ba , ProtoBuf.encodeToByteArray(t))
-        assertEquals( t, ProtoBuf.decodeFromByteArray<Test>(ba))
+        assertContentEquals(ba, ProtoBuf.encodeToByteArray(t))
+        assertEquals(t, ProtoBuf.decodeFromByteArray<Test>(ba))
 
         assertEquals(json, Json.encodeToString(t))
         assertEquals(t, Json.decodeFromString<Test>(json))
@@ -46,6 +47,23 @@ class AsciiStringTest {
         AsciiString("FOO", 10, TextAlignment.ALIGN_RIGHT).copyInto(ba)
 
         assertContentEquals(ubyteArrayOf(0x20u, 0x20u, 0x20u, 0x20u, 0x20u, 0x20u, 0x20u, 0x46u, 0x4Fu, 0x4Fu), ba)
+
+    }
+
+    @Test
+    fun testEncode() {
+
+        assertContentEquals(byteArrayOf(70, 79, 79), AsciiString("FOO").toBytes())
+        assertContentEquals(ubyteArrayOf(70u, 79u, 79u), AsciiString("FOO").toUBytes())
+        assertContentEquals(listOf(70, 79, 79), AsciiString("FOO").toIntBytes())
+        assertContentEquals(listOf(), AsciiString("").toIntBytes())
+        assertFailsWith<IllegalArgumentException> { AsciiString("FOÖ").toBytes() }
+
+        assertFailsWith<CharacterCodingException> {  listOf(0x20, 129).toAsciiString().getOrThrow() }
+        assertFailsWith<CharacterCodingException> {  byteArrayOf(0x20, 129.b).toAsciiString().getOrThrow() }
+        assertEquals(AsciiString("FOO"), listOf(70, 79, 79).toAsciiString().getOrThrow())
+        assertEquals(AsciiString("FOO"), byteArrayOf(70, 79, 79).toAsciiString().getOrThrow())
+
 
     }
 }
