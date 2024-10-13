@@ -71,6 +71,12 @@ value class AsciiString(val s: String) {
         require(s.all { it in ' '..'~' })
     }
 
+    fun toBytes(): ByteArray = s.encodeToByteArray()
+
+    fun toUBytes(): UByteArray = toBytes().toUByteArray()
+
+    fun toIntBytes(): List<Int> = toBytes().toListOfInt()
+
     /**
      * Construct an [AsciiString] from [s] which is padded according to [length], [alignment] and [padChar]
      *
@@ -109,7 +115,13 @@ value class AsciiString(val s: String) {
     }
 }
 
-fun UByteArray.readAsciiString(offset: Int = 0, length: Int): Result<AsciiString> = try {
+fun List<Int>.toAsciiString(offset: Int = 0, length: Int = size): Result<AsciiString> =
+    toUByteArray().toAsciiString(offset, length)
+
+fun ByteArray.toAsciiString(offset: Int = 0, length: Int = size): Result<AsciiString> =
+    toUByteArray().toAsciiString(offset, length)
+
+fun UByteArray.toAsciiString(offset: Int = 0, length: Int): Result<AsciiString> = try {
     require(offset + length <= size)
     val ca = CharArray(length)
     for (i in 0..<length) {

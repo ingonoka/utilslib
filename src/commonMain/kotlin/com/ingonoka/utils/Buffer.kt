@@ -531,7 +531,7 @@ class BufferImpl internal constructor(
 
     override fun readString(n: Int): Result<AsciiString> = try {
 
-        buffer.readAsciiString(position, n).onSuccess { position += n }
+        buffer.toAsciiString(position, n).onSuccess { position += n }
 
     } catch (e: Exception) {
 
@@ -629,7 +629,7 @@ class BufferImpl internal constructor(
 
     override fun peekLongOrNull(n: Int, byteOrder: ByteOrder): Long? = peekLong(n, byteOrder).getOrNull()
 
-    override fun peekString(n: Int): Result<AsciiString> = buffer.readAsciiString(position, n)
+    override fun peekString(n: Int): Result<AsciiString> = buffer.toAsciiString(position, n)
 
     override fun peekStringOrNull(n: Int): AsciiString? = peekString(n).getOrNull()
 
