@@ -188,9 +188,11 @@ inline fun ByteArray.mapInPlace(mutator: (Byte) -> Byte): ByteArray {
 /**
  * Convert a [ByteArray] to a list of Int
  */
-fun ByteArray.toListOfInt(): List<Int> = map { it.toInt() }
+fun ByteArray.toListOfInt(): List<Int> = map { it.ui }
 
 /**
  * Convert each element of the list to a byte and convert the resulting list of bytes to a byte array.
  */
 fun List<Int>.toByteArray(): ByteArray = map { it.toByte() }.toByteArray()
+fun List<Int>.toUByteArray(): UByteArray = map { it.toUByte() }.toUByteArray()
+inline val List<Int>.asBytes: List<Int> get() = map { it and 0xFF }

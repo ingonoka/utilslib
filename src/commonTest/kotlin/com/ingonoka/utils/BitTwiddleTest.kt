@@ -105,7 +105,7 @@ class BitTwiddleTest {
         assertEquals(listOf(), input.toListOfInt())
 
         input = byteArrayOf(1, -1, 0, -128, 127)
-        assertEquals(listOf(1, -1, 0, -128, 127), input.toListOfInt())
+        assertEquals(listOf(1, 255, 0, 128, 127), input.toListOfInt())
     }
 
     @Test
@@ -128,5 +128,11 @@ class BitTwiddleTest {
         input.mapInPlace { 2 }
         assertArrayEquals(byteArrayOf(2).toTypedArray(), input.toTypedArray())
 
+    }
+
+    @Test
+    fun testToBytes() {
+        println((-256).toHexString())
+        assertEquals("00ffff817f0181", listOf(0, -1, 255, -127, 127, -255, 129).toByteArray().toHexString())
     }
 }
