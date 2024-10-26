@@ -226,17 +226,17 @@ class LongIntToFromBytesKtTest {
 
     @Test
     fun testToLong() {
-        assertEquals(0, "0000000000000000".hexToBytes().toLong(0).getOrThrow())
-        assertEquals(0, "0000000000000000".hexToBytes().toLong().getOrThrow())
-        assertEquals(1, "0000000000000001".hexToBytes().toLong(0).getOrThrow())
-        assertEquals(-1, "FFFFFFFFFFFFFFFF".hexToBytes().toLong(0).getOrThrow())
-        assertEquals(-1, "00FFFFFFFFFFFFFFFF".hexToBytes().toLong(1).getOrThrow())
-        assertEquals(-1, "FFFFFFFFFFFFFFFF00".hexToBytes().toLong(0).getOrThrow())
-        assertEquals(128, "0000000000000080".hexToBytes().toLong(0).getOrThrow())
-        assertEquals(Long.MAX_VALUE, "7FFFFFFFFFFFFFFF".hexToBytes().toLong(0).getOrThrow())
-        assertEquals(Long.MIN_VALUE, "8000000000000000".hexToBytes().toLong(0).getOrThrow())
-        assertFails { "00000000000000".hexToBytes().toLong(0).getOrThrow() }
-        assertFails { "0000000000000000".hexToBytes().toLong(1).getOrThrow() }
+        assertEquals(0, "0000000000000000".hexToBytes().toLong(0))
+        assertEquals(0, "0000000000000000".hexToBytes().toLong())
+        assertEquals(1, "0000000000000001".hexToBytes().toLong(0))
+        assertEquals(-1, "FFFFFFFFFFFFFFFF".hexToBytes().toLong(0))
+        assertEquals(-1, "00FFFFFFFFFFFFFFFF".hexToBytes().toLong(1))
+        assertEquals(-1, "FFFFFFFFFFFFFFFF00".hexToBytes().toLong(0))
+        assertEquals(128, "0000000000000080".hexToBytes().toLong(0))
+        assertEquals(Long.MAX_VALUE, "7FFFFFFFFFFFFFFF".hexToBytes().toLong(0))
+        assertEquals(Long.MIN_VALUE, "8000000000000000".hexToBytes().toLong(0))
+        assertFails { "00000000000000".hexToBytes().toLong(0) }
+        assertFails { "0000000000000000".hexToBytes().toLong(1) }
 
     }
 

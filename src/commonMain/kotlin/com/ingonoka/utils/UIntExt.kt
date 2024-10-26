@@ -11,11 +11,7 @@ fun UInt.toIntBytes(
     length: Int = UInt.SIZE_BYTES,
     byteOrder: ByteOrder = BIG_ENDIAN,
 ): List<Int> = toUBytes(length, byteOrder).map { it.toInt() }
-
-fun UInt.toUBytes(
-    length: Int = UInt.SIZE_BYTES,
-    byteOrder: ByteOrder = BIG_ENDIAN,
-): UByteArray {
+fun UInt.toUBytes(length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN ): UByteArray {
 
     require(length in 0..UInt.SIZE_BYTES)
 
@@ -38,11 +34,7 @@ fun UInt.toUBytes(
     }
     return ba
 }
-
-fun UInt.toBytes(
-    length: Int = UInt.SIZE_BYTES,
-    byteOrder: ByteOrder = BIG_ENDIAN,
-): ByteArray {
+fun UInt.toBytes(length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN ): ByteArray {
 
     require(length in 0..UInt.SIZE_BYTES)
 
@@ -70,11 +62,7 @@ fun Int.toIntBytes(
     length: Int = UInt.SIZE_BYTES,
     byteOrder: ByteOrder = BIG_ENDIAN,
 ): List<Int> = toUBytes(length, byteOrder).map { it.toInt() }
-
-fun Int.toUBytes(
-    length: Int = UInt.SIZE_BYTES,
-    byteOrder: ByteOrder = BIG_ENDIAN,
-): UByteArray {
+fun Int.toUBytes(length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN ): UByteArray {
 
     require(length in 0..UInt.SIZE_BYTES)
 
@@ -97,11 +85,7 @@ fun Int.toUBytes(
     }
     return ba
 }
-
-fun Int.toBytes(
-    length: Int = UInt.SIZE_BYTES,
-    byteOrder: ByteOrder = BIG_ENDIAN,
-): ByteArray {
+fun Int.toBytes(length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): ByteArray {
 
     require(length in 0..UInt.SIZE_BYTES)
 
@@ -125,16 +109,21 @@ fun Int.toBytes(
     return ba
 }
 
+fun Long.toIntBytes(
+    length: Int = Long.SIZE_BYTES,
+    byteOrder: ByteOrder = BIG_ENDIAN
+): List<Int> = toULong().toUBytes(length, byteOrder).map { it.toInt() }
 fun Long.toUBytes(
     length: Int = Long.SIZE_BYTES,
     byteOrder: ByteOrder = BIG_ENDIAN
 ): UByteArray = toULong().toUBytes(length, byteOrder)
-
 fun Long.toBytes(
     length: Int = Long.SIZE_BYTES,
     byteOrder: ByteOrder = BIG_ENDIAN
 ): ByteArray = toULong().toBytes(length, byteOrder)
 
+fun ULong.toIntBytes(length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): List<Int> =
+    toUBytes(length, byteOrder).map { it.toInt() }
 fun ULong.toUBytes(length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): UByteArray {
 
     require(length in 0..ULong.SIZE_BYTES)
@@ -159,45 +148,31 @@ fun ULong.toUBytes(length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_EN
     }
     return ba
 }
-
 fun ULong.toBytes(length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): ByteArray =
     toUBytes(length, byteOrder).toByteArray()
 
-fun UByteArray.toUInt(
-    offset: Int = 0,
-    length: Int = UInt.SIZE_BYTES,
-    byteOrder: ByteOrder = BIG_ENDIAN
-): UInt {
+fun UByteArray.toInt(offset: Int = 0, length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): Int {
     require(length in 1..4)
     require(offset + length <= size)
 
-    var i = 0u
-
-    when (byteOrder) {
-        BIG_ENDIAN -> {
-            if (length > 3) i = i or (this[offset + length - 4].toUInt() shl 24)
-            if (length > 2) i = i or (this[offset + length - 3].toUInt() shl 16)
-            if (length > 1) i = i or (this[offset + length - 2].toUInt() shl 8)
-            i = i or this[offset + length - 1].toUInt()
-        }
-
-        LITTLE_ENDIAN -> {
-            if (length > 3) i = i or (this[offset + length - 1].toUInt() shl 24)
-            if (length > 2) i = i or (this[offset + length - 2].toUInt() shl 16)
-            if (length > 1) i = i or (this[offset + length - 3].toUInt() shl 8)
-            i = i or this[offset + length - 4].toUInt()
-        }
-    }
-
-    return i
+    return toULong(offset, length, byteOrder).toInt()
 
 }
+fun UByteArray.toUInt(offset: Int = 0, length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): UInt {
+    require(length in 1..4)
+    require(offset + length <= size)
 
-fun UByteArray.toULong(
-    offset: Int = 0,
-    length: Int = ULong.SIZE_BYTES,
-    byteOrder: ByteOrder = BIG_ENDIAN
-): ULong {
+    return toULong(offset, length, byteOrder).toUInt()
+
+}
+fun UByteArray.toLong(offset: Int = 0, length: Int = Long.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): Long {
+    require(length in 1..Long.SIZE_BYTES)
+    require(offset + length <= size)
+
+    return toULong(offset, length, byteOrder).toLong()
+
+}
+fun UByteArray.toULong(offset: Int = 0, length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): ULong {
     require(length in 1..8)
     require(offset + length <= size)
 
@@ -223,6 +198,80 @@ fun UByteArray.toULong(
 
     return uLong
 
+}
+
+fun ByteArray.toInt(offset: Int = 0, length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): Int {
+    require(length in 1..4)
+    require(offset + length <= size)
+
+    return toULong(offset, length, byteOrder).toInt()
+
+}
+fun ByteArray.toUInt(offset: Int = 0, length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): UInt {
+    require(length in 1..4)
+    require(offset + length <= size)
+
+    return toULong(offset, length, byteOrder).toUInt()
+
+}
+fun ByteArray.toLong(offset: Int = 0, length: Int = Long.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): Long {
+    require(length in 1..8)
+    require(offset + length <= size)
+
+    return toULong(offset, length, byteOrder).toLong()
+
+}
+fun ByteArray.toULong(offset: Int = 0, length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): ULong {
+    require(length in 1..8)
+    require(offset + length <= size)
+
+    var uLong = 0uL
+
+    when (byteOrder) {
+        BIG_ENDIAN -> {
+            for (i in 0..<length) {
+                val a = this[offset + i].toULong() and 0xFFu
+                val b = (length - 1 - i) * 8
+                uLong = uLong or (a shl b)
+            }
+        }
+
+        LITTLE_ENDIAN -> {
+            for (i in 0..<length) {
+                val a = this[offset + i].toULong()
+                val b = i * 8
+                uLong = uLong or (a shl b)
+            }
+        }
+    }
+
+    return uLong
+
+}
+
+fun ReadBuffer.toInt(length: Int = Int.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): Int {
+    require(length in 1..8)
+    require(hasBytesLeftToRead(length))
+
+    return readUByteArray(length).map { it.toInt(0, length, byteOrder) }.getOrThrow()
+}
+fun ReadBuffer.toUInt(length: Int = UInt.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): UInt {
+    require(length in 1..8)
+    require(hasBytesLeftToRead(length))
+
+    return readUByteArray(length).map { it.toUInt(0, length, byteOrder) }.getOrThrow()
+}
+fun ReadBuffer.toLong(length: Int = Long.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): Long {
+    require(length in 1..Long.SIZE_BYTES)
+    require(hasBytesLeftToRead(length))
+
+    return readUByteArray(length).map { it.toLong(0, length, byteOrder) }.getOrThrow()
+}
+fun ReadBuffer.toULong(length: Int = ULong.SIZE_BYTES, byteOrder: ByteOrder = BIG_ENDIAN): ULong {
+    require(length in 1..ULong.SIZE_BYTES)
+    require(hasBytesLeftToRead(length))
+
+    return readUByteArray(length).map { it.toULong(0, length, byteOrder) }.getOrThrow()
 }
 
 fun UByteArray.readUInt(

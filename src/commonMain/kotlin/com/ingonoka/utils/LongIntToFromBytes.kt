@@ -331,27 +331,7 @@ fun List<Int>.toLongNoLeadingZeros(numBytes: Int = 0, index: Int = 0): Result<Lo
 }
 
 /**
- * Use four bytes of the [ByteArray] and interpret as  [Long] . Start reading at [index]
- *
- * An empty array yields 0.
- */
-fun ByteArray.toLong(index: Int = 0): Result<Long> =
-    when {
-        index + 8 > size -> Result.failure(Exception("Only ${size - index} bytes left in array.  Need 8 for a Long"))
-        else -> Result.success(
-            (((get(index).toLong() and 0xFF)) shl 56) or
-                    (((get(index + 1).toLong() and 0xFF)) shl 48) or
-                    (((get(index + 2).toLong() and 0xFF)) shl 40) or
-                    (((get(index + 3).toLong() and 0xFF)) shl 32) or
-                    (((get(index + 4).toLong() and 0xFF)) shl 24) or
-                    (((get(index + 5).toLong() and 0xFF)) shl 16) or
-                    (((get(index + 6).toLong() and 0xFF)) shl 8) or
-                    (get(index + 7).toLong() and 0xFF)
-        )
-    }
-
-/**
- * Read [n] bytes from the packet and interpret them as [Long] without leading zeros.
+ * Read [n] bytes from the packet and interpret them as Long without leading zeros.
  *
  * A failure result is returned if:
  *
@@ -384,79 +364,6 @@ fun ReadBuffer.readLongNoLeadingZeros(n: Int = -1): Result<Long> = try {
  *
  */
 fun ReadBuffer.readIntNoLeadingZeros(n: Int): Result<Int> = readLongNoLeadingZeros(n).map { it.toInt() }
-
-
-/**
- * Convert a ULong to a list of int.
- * The resulting array only has as many bytes as are necessary to store all bits without any leading zero bytes.
- */
-//private fun ULong.toByteArrayWithoutLeadingZeros(): Result<List<Int>> = Result.success(
-//    when {
-//
-//        this < 256u -> listOf(
-//            (this and 255u)
-//        )
-//
-//        this < 65536u -> listOf(
-//            ((this shr 8) and 255u),
-//            (this and 255u)
-//
-//        )
-//
-//        this < 16777216u -> listOf(
-//            ((this shr 16) and 255u),
-//            ((this shr 8) and 255u),
-//            (this and 255u)
-//        )
-//
-//        this < 4294967296u -> listOf(
-//            ((this shr 24) and 255u),
-//            ((this shr 16) and 255u),
-//            ((this shr 8) and 255u),
-//            (this and 255u)
-//        )
-//
-//        this < 1099511627776u -> listOf(
-//            ((this shr 32) and 255u),
-//            ((this shr 24) and 255u),
-//            ((this shr 16) and 255u),
-//            ((this shr 8) and 255u),
-//            (this and 255u)
-//        )
-//
-//        this < 281474976710656u -> listOf(
-//            ((this shr 40) and 255u),
-//            ((this shr 32) and 255u),
-//            ((this shr 24) and 255u),
-//            ((this shr 16) and 255u),
-//            ((this shr 8) and 255u),
-//            (this and 255u)
-//        )
-//
-//        this < 72057594037927936u -> listOf(
-//            ((this shr 48) and 255u),
-//            ((this shr 40) and 255u),
-//            ((this shr 32) and 255u),
-//            ((this shr 24) and 255u),
-//            ((this shr 16) and 255u),
-//            ((this shr 8) and 255u),
-//            (this and 255u)
-//        )
-//
-//        else -> listOf(
-//            ((this shr 56) and 255u),
-//            ((this shr 48) and 255u),
-//            ((this shr 40) and 255u),
-//            ((this shr 32) and 255u),
-//            ((this shr 24) and 255u),
-//            ((this shr 16) and 255u),
-//            ((this shr 8) and 255u),
-//            (this and 255u)
-//        )
-//    }.map {
-//        it.toInt()
-//    }
-//)
 
 /**
  * Convert a [Long] to a [ByteArray]. The resulting array only has as many bytes as are necessary to store all bits
@@ -556,11 +463,3 @@ fun Long.toByteArrayWithoutLeadingZeros(): Result<List<Int>> = Result.success(
  */
 fun Int.toByteArrayWithoutLeadingZeros(): Result<List<Int>> =
     (toLong() and 0xFFFFFFFF).toByteArrayWithoutLeadingZeros()
-
-///**
-// * Write a [Int] to a [PoorMansByteBuffer]
-// *
-// * @see Int.toByteArrayWithoutLeadingZeros
-// */
-//fun PoorMansByteBuffer.writeIntNoLeadingZeros(i: Int) =
-//    i.toByteArrayWithoutLeadingZeros().map { bytes -> writeByteArray(bytes) }
