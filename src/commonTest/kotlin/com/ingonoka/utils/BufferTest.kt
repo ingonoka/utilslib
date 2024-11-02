@@ -15,6 +15,34 @@ import kotlin.test.*
 class BufferTest {
 
     @Test
+    fun testCountWhile() {
+        val b = listOf(1, 2, 3, 4, 5, 6).buffer()
+        assertEquals(3, b.countWhile { it < 4 }.getOrThrow())
+        val b1 = listOf<Int>().buffer()
+        assertEquals(0, b1.countWhile { it < 4 }.getOrThrow())
+        val b2 = listOf<Int>(1, 2, 3, 4, 5, 6).buffer()
+        assertEquals(6, b2.countWhile { it < 7 }.getOrThrow())
+        val b3 = listOf<Int>(7, 8, 9, 10, 11, 12, 13).buffer()
+        assertEquals(0, b3.countWhile { it < 7 }.getOrThrow())
+
+    }
+
+    @Test
+    fun testView() {
+        val b = listOf(1, 2, 3, 4, 5, 6).buffer()
+        b.readByte()
+        assertEquals(1, b.position)
+
+        b.view().apply {
+            assertEquals(1, position)
+            readByte()
+            assertEquals(2, position)
+        }
+        assertEquals(1, b.position)
+
+    }
+
+    @Test
     fun testEquals() {
         val b1 = listOf(1, 2, 3, 4, 5, 6).buffer()
         val b2 = listOf(1, 2, 3, 4, 5, 6).buffer()
@@ -356,7 +384,7 @@ class BufferTest {
         byteBuffer.write(200)
         assertEquals(listOf(0, 0, 0, 200), byteBuffer.toList())
 
-       byteBuffer.reset()
+        byteBuffer.reset()
         byteBuffer.write(200, 4, ByteOrder.LITTLE_ENDIAN)
         assertEquals(listOf(200, 0, 0, 0), byteBuffer.toList())
 
@@ -913,7 +941,6 @@ class BufferTest {
 
         assertEquals(2, readBuf.readByte().getOrThrow())
         assertEquals(3, readBuf.readByte().getOrThrow())
-
 
 
     }
