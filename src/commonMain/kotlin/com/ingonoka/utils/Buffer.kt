@@ -231,6 +231,17 @@ interface ReadBuffer : Buffer {
     fun bytesLeftToRead(): Int
 
     /**
+     * Count the elements that meet [predicate], starting with current position.
+     * Does not change the position of the buffer.
+     */
+    fun countWhile(predicate: (b: Byte) -> Boolean): Result<Int> = runCatching {
+        var n = 0
+        val view = view()
+        while (view.readByte().map { predicate(it) }.getOrDefault(false)) n++
+        n
+    }
+
+    /**
      *  After calling this function, the buffer can be read from the start again.
      *
      * The [watermark] at the time the function is called determines the number of bytes that can be read.
@@ -258,6 +269,12 @@ interface ReadBuffer : Buffer {
      *
      */
     fun seekTo(n: Int): Result<Int>
+
+    /**
+     * Provide a view into this [ReadBuffer].
+     * Reading from the view will not affect the position in the original [ReadBuffer].
+     */
+    fun view(): ReadBuffer
 }
 
 interface WriteBuffer : Buffer {
@@ -727,6 +744,7 @@ class BufferImpl internal constructor(
         Result.failure(e)
     }
 
+    override fun view(): ReadBuffer = BufferImpl(buffer, watermark).also { it.position = position }
 
     /**
      * Create new backing buffer, which is n bytes larger than the current one. The content of the
