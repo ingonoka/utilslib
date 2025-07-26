@@ -305,11 +305,13 @@ interface WriteBuffer : Buffer {
      * [1, 0, 0, 0, 0, 0, 0, 0]
      * ```
      * @param n Number of bytes to write
+     * @return Number of bytes written
      */
-    fun write(l: Long, n: Int = 8, byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN)
+    fun write(l: Long, n: Int = 8, byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): Result<Int>
 
     /**
-     * Copy [i] into buffer (n bytes only)
+     * Copy [i] into buffer ([n] bytes only).
+     * If [n] is zero, only write the minimum number of bytes.
      * ```
      * ```
      * If [byteOrder] is [ByteOrder.BIG_ENDIAN], then the highest byte will be written first
@@ -325,8 +327,9 @@ interface WriteBuffer : Buffer {
      * [1, 0, 0, 0]
      * ```
      * @param n Number of bytes to write
+     * @return Number of bytes written
      */
-    fun write(i: Int, n: Int = 4, byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN)
+    fun write(i: Int, n: Int = 4, byteOrder: ByteOrder = ByteOrder.BIG_ENDIAN): Result<Int>
 
     /**
      * Write st[str]ring in UTF-8 encoding to buffer
@@ -476,14 +479,18 @@ class BufferImpl internal constructor(
     override fun writeAll(vararg b: Byte) = write(b)
     override fun writeAll(vararg b: UByte) = write(b)
 
-    override fun write(i: Int, n: Int, byteOrder: ByteOrder) {
+    override fun write(i: Int, n: Int, byteOrder: ByteOrder): Result<Int> = runCatching {
+        val startPosition = position
         if (position + n > capacity) extend(n)
-        position = i.toUInt().copyInto(buffer, position, n, byteOrder)
+        position += i.toUInt().copyInto(buffer, position, n, byteOrder).getOrThrow()
+        position - startPosition
     }
 
-    override fun write(l: Long, n: Int, byteOrder: ByteOrder) {
+    override fun write(l: Long, n: Int, byteOrder: ByteOrder): Result<Int> = runCatching {
+        val startPosition = position
         if (position + n > capacity) extend(n)
-        position = l.toULong().copyInto(buffer, position, n, byteOrder)
+        position += l.toULong().copyInto(buffer, position, n, byteOrder).getOrThrow()
+        position - startPosition
     }
 
     override fun write(str: String) = write(str.encodeToByteArray().toUByteArray())
