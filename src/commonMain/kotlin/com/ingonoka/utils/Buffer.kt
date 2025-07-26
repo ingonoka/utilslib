@@ -289,7 +289,8 @@ interface WriteBuffer : Buffer {
     fun writeUByte(b: UByte)
 
     /**
-     * Copy [l] into buffer (n bytes only)
+     * Copy [l] into buffer ([n] bytes only).
+     * If [n] is 0, the minimum number of bytes will be used.
      * ```
      * ```
      * If [byteOrder] is [ByteOrder.BIG_ENDIAN], then the highest byte will be written first

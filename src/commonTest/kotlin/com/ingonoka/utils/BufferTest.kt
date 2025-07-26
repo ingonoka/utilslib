@@ -105,10 +105,10 @@ class BufferTest {
         byteBuffer.writeByte(0x00)
         assertEquals(MIN_EXTEND_SIZE + 1, byteBuffer.position)
 
-        byteBuffer = BufferImpl.empty(4)
-        byteBuffer.write(0)
+        byteBuffer = BufferImpl.empty(8)
+        byteBuffer.write(0).getOrThrow()
         assertEquals(4, byteBuffer.position)
-        byteBuffer.write(0)
+        byteBuffer.write(0).getOrThrow()
         assertEquals(8, byteBuffer.position)
 
         byteBuffer = BufferImpl.empty()
@@ -328,20 +328,20 @@ class BufferTest {
         byteBuffer.reset()
         byteBuffer.write(0xFF, 1)
         assertEquals(1, byteBuffer.position)
-        assertFails { byteBuffer.write(256, 1) }
+        assertFails { byteBuffer.write(256, 1).getOrThrow() }
 
         byteBuffer.write(0xFFFF, 2)
         assertEquals(3, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFF + 1, 2) }
+        assertFails { byteBuffer.write(0xFFFF + 1, 2).getOrThrow() }
 
         byteBuffer.write(0xFFFFFF, 3)
         assertEquals(6, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFF + 1, 3) }
+        assertFails { byteBuffer.write(0xFFFFFF + 1, 3).getOrThrow() }
 
         byteBuffer.write(-1, 4)
         assertEquals(10, byteBuffer.position)
 
-        assertFails { byteBuffer.write(-1, 3) }
+        assertFails { byteBuffer.write(-1, 3).getOrThrow() }
 
         byteBuffer.toReadBuffer().apply {
             assertEquals(0xFF, readInt(1).getOrThrow())
@@ -485,35 +485,35 @@ class BufferTest {
         byteBuffer.reset()
         byteBuffer.write(0xFFL, 1)
         assertEquals(1, byteBuffer.position)
-        assertFails { byteBuffer.write(256L, 1) }
+        assertFails { byteBuffer.write(256L, 1).getOrThrow() }
 
         byteBuffer.write(0xFFFFL, 2)
         assertEquals(3, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFF + 1, 2) }
+        assertFails { byteBuffer.write(0xFFFF + 1, 2).getOrThrow() }
 
         byteBuffer.write(0xFFFFFFL, 3)
         assertEquals(6, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFF + 1, 3) }
+        assertFails { byteBuffer.write(0xFFFFFF + 1, 3).getOrThrow() }
 
         byteBuffer.write(0xFFFFFFFFL, 4)
         assertEquals(10, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFFFF + 1, 4) }
+        assertFails { byteBuffer.write(0xFFFFFFFF + 1, 4).getOrThrow() }
 
         byteBuffer.write(0xFFFFFFFFFFL, 5)
         assertEquals(15, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFFFFFF + 1, 5) }
+        assertFails { byteBuffer.write(0xFFFFFFFFFF + 1, 5).getOrThrow() }
 
         byteBuffer.write(0xFFFFFFFFFFFFL, 6)
         assertEquals(21, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFFFFFFFF + 1, 6) }
+        assertFails { byteBuffer.write(0xFFFFFFFFFFFF + 1, 6).getOrThrow() }
 
         byteBuffer.write(0xFFFFFFFFFFFFFFL, 7)
         assertEquals(28, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFFFFFFFFFF + 1, 7) }
+        assertFails { byteBuffer.write(0xFFFFFFFFFFFFFF + 1, 7).getOrThrow() }
 
         byteBuffer.write(-1L, 8)
         assertEquals(36, byteBuffer.position)
-        assertFails { byteBuffer.write(-1L, 7) }
+        assertFails { byteBuffer.write(-1L, 7).getOrThrow() }
 
         byteBuffer.toReadBuffer().apply {
             assertEquals(0xFFL, readLong(1).getOrThrow())
@@ -529,35 +529,35 @@ class BufferTest {
         byteBuffer.reset()
         byteBuffer.write(1, 1, ByteOrder.LITTLE_ENDIAN)
         assertEquals(1, byteBuffer.position)
-        assertFails { byteBuffer.write(256L, 1) }
+        assertFails { byteBuffer.write(256L, 1).getOrThrow() }
 
         byteBuffer.write(1L, 2, ByteOrder.LITTLE_ENDIAN)
         assertEquals(3, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFF + 1, 2) }
+        assertFails { byteBuffer.write(0xFFFF + 1, 2).getOrThrow() }
 
         byteBuffer.write(1L, 3, ByteOrder.LITTLE_ENDIAN)
         assertEquals(6, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFF + 1, 3) }
+        assertFails { byteBuffer.write(0xFFFFFF + 1, 3).getOrThrow() }
 
         byteBuffer.write(1L, 4, ByteOrder.LITTLE_ENDIAN)
         assertEquals(10, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFFFF + 1, 4) }
+        assertFails { byteBuffer.write(0xFFFFFFFF + 1, 4).getOrThrow() }
 
         byteBuffer.write(1L, 5, ByteOrder.LITTLE_ENDIAN)
         assertEquals(15, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFFFFFF + 1, 5) }
+        assertFails { byteBuffer.write(0xFFFFFFFFFF + 1, 5).getOrThrow() }
 
         byteBuffer.write(1L, 6, ByteOrder.LITTLE_ENDIAN)
         assertEquals(21, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFFFFFFFF + 1, 6) }
+        assertFails { byteBuffer.write(0xFFFFFFFFFFFF + 1, 6).getOrThrow() }
 
         byteBuffer.write(1L, 7, ByteOrder.LITTLE_ENDIAN)
         assertEquals(28, byteBuffer.position)
-        assertFails { byteBuffer.write(0xFFFFFFFFFFFFFF + 1, 7) }
+        assertFails { byteBuffer.write(0xFFFFFFFFFFFFFF + 1, 7).getOrThrow() }
 
         byteBuffer.write(Long.MIN_VALUE, 8, ByteOrder.LITTLE_ENDIAN)
         assertEquals(36, byteBuffer.position)
-        assertFails { byteBuffer.write(-1L, 7) }
+        assertFails { byteBuffer.write(-1L, 7).getOrThrow() }
 
         byteBuffer.toReadBuffer().apply {
             assertEquals(1L, readLong(1, ByteOrder.LITTLE_ENDIAN).getOrThrow())
