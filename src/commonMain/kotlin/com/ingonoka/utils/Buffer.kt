@@ -764,33 +764,38 @@ class BufferImpl internal constructor(
     }
 
     /**
-     * Two buffers are equal if [position], [watermark] and the populated bytes are the same
+     * Two [Buffer] objects are equal if they have the same watermark and position, and if all buffer elements upto
+     * the [watermark] are identical.
+     * Buffer elements beyond the watermark are ignored.
      */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
+        if (other !is BufferImpl) return false
 
-        other as BufferImpl
-
-        if (position != other.position) return false
         if (watermark != other.watermark) return false
-        for (i in 0..<watermark)
-            if (buffer[i] != other.buffer[i]) return false
+        if (position != other.position) return false
+
+        if(watermark == buffer.size) {
+            if (!buffer.contentEquals(other.buffer)) return false
+        } else {
+            buffer.onEachIndexed { index, t ->
+                if(index >= watermark) return@onEachIndexed
+                if( t != other.buffer[index]) return false
+            }
+        }
         return true
     }
 
     /**
-     * Hash code based on populated part of backing buffer.
-     *
-     * Only buffers that have the same populated bytes and the same read/write position are
-     * guaranteed to produce the same hash code
+     * The hash code enures that [Buffer] objects that are equal also have the same hashcode by ensuring
+     * that only buffer elements upto the [watermark] are included in the calculation of the hashcode.
      */
     override fun hashCode(): Int {
-        var result = 0
-        for (i in 0..<0 + watermark) {
-            result = 31 * result + buffer[i].toInt()
+        var result = watermark
+        result = buffer.foldIndexed(result) {index, acc, unit ->
+            if(index >= watermark) return@foldIndexed(acc)
+            31 * acc + unit.hashCode()
         }
-        result = 31 * result + watermark
         result = 31 * result + position
         return result
     }
