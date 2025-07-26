@@ -926,6 +926,7 @@ class UByteExtTest {
         data class TestCase(
             val unsignedInt: UInt,
             val expected: UByteArray,
+            val minLength: Int,
             val offset: Int,
             val newIndex: Int,
             val encodingLength: Int,
@@ -934,61 +935,64 @@ class UByteExtTest {
 
         val testCases = listOf(
             TestCase(
-                0xffu, ubyteArrayOf(0u, 0u, 0u, 0xffu, 0u, 0u, 0u, 0u), 0, 4, 4, BIG_ENDIAN
+                0xffu, ubyteArrayOf(0u, 0u, 0u, 0xffu, 0u, 0u, 0u, 0u), 1, 0, 4, 4, BIG_ENDIAN
             ),
             TestCase(
-                0xffu, ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0xffu), 4, 8, 4, BIG_ENDIAN
+                0xffu, ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0xffu), 1, 4, 8, 4, BIG_ENDIAN
             ),
             TestCase(
-                0xffu, ubyteArrayOf(0xffu, 0u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 4, 4, LITTLE_ENDIAN
+                0xffu, ubyteArrayOf(0xffu, 0u, 0u, 0u, 0u, 0u, 0u, 0u), 1, 0, 4, 4, LITTLE_ENDIAN
             ),
             TestCase(
-                0xffu + 1u, ubyteArrayOf(0u, 0u, 0x01u, 0u, 0u, 0u, 0u, 0u), 0, 4, 4, BIG_ENDIAN
+                0xffu + 1u, ubyteArrayOf(0u, 0u, 0x01u, 0u, 0u, 0u, 0u, 0u), 2, 0, 4, 4, BIG_ENDIAN
             ),
             TestCase(
-                0xffu + 1u, ubyteArrayOf(0u, 0x01u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 4, 4, LITTLE_ENDIAN
+                0xffu + 1u, ubyteArrayOf(0u, 0x01u, 0u, 0u, 0u, 0u, 0u, 0u), 2, 0, 4, 4, LITTLE_ENDIAN
             ),
             TestCase(
-                0x0102u, ubyteArrayOf(0u, 0u, 0x01u, 0x02u, 0u, 0u, 0u, 0u), 0, 4, 4, BIG_ENDIAN
+                0x0102u, ubyteArrayOf(0u, 0u, 0x01u, 0x02u, 0u, 0u, 0u, 0u), 2, 0, 4, 4, BIG_ENDIAN
             ),
             TestCase(
-                0x0102u, ubyteArrayOf(0x02u, 0x01u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 4, 4, LITTLE_ENDIAN
+                0x0102u, ubyteArrayOf(0x02u, 0x01u, 0u, 0u, 0u, 0u, 0u, 0u), 2, 0, 4, 4, LITTLE_ENDIAN
             ),
             TestCase(
-                0x010203u, ubyteArrayOf(0u, 0x01u, 0x02u, 0x03u, 0u, 0u, 0u, 0u), 0, 4, 4, BIG_ENDIAN
+                0x010203u, ubyteArrayOf(0u, 0x01u, 0x02u, 0x03u, 0u, 0u, 0u, 0u), 3, 0, 4, 4, BIG_ENDIAN
             ),
             TestCase(
-                0x010203u, ubyteArrayOf(0x03u, 0x02u, 0x01u, 0u, 0u, 0u, 0u, 0u), 0, 4, 4, LITTLE_ENDIAN
+                0x010203u, ubyteArrayOf(0x03u, 0x02u, 0x01u, 0u, 0u, 0u, 0u, 0u), 3, 0, 4, 4, LITTLE_ENDIAN
             ),
             TestCase(
-                0x01020304u, ubyteArrayOf(0x01u, 0x02u, 0x03u, 0x04u, 0u, 0u, 0u, 0u), 0, 4, 4, BIG_ENDIAN
+                0x01020304u, ubyteArrayOf(0x01u, 0x02u, 0x03u, 0x04u, 0u, 0u, 0u, 0u), 4, 0, 4, 4, BIG_ENDIAN
             ),
             TestCase(
-                0x01020304u, ubyteArrayOf(0x04u, 0x03u, 0x02u, 0x01u, 0u, 0u, 0u, 0u), 0, 4, 4, LITTLE_ENDIAN
+                0x01020304u, ubyteArrayOf(0x04u, 0x03u, 0x02u, 0x01u, 0u, 0u, 0u, 0u), 4, 0, 4, 4, LITTLE_ENDIAN
             ),
             TestCase(
-                0x01020304u, ubyteArrayOf(0u, 0u, 0u, 0u, 0x01u, 0x02u, 0x03u, 0x04u), 4, 8, 4, BIG_ENDIAN
+                0x01020304u, ubyteArrayOf(0u, 0u, 0u, 0u, 0x01u, 0x02u, 0x03u, 0x04u), 4, 4, 8, 4, BIG_ENDIAN
             ),
             TestCase(
-                0x01020304u, ubyteArrayOf(0u, 0u, 0u, 0u, 0x04u, 0x03u, 0x02u, 0x01u), 4, 8, 4, LITTLE_ENDIAN
+                0x01020304u, ubyteArrayOf(0u, 0u, 0u, 0u, 0x04u, 0x03u, 0x02u, 0x01u), 4, 4, 8, 4, LITTLE_ENDIAN
             ),
 
             TestCase(
-                0x0102u, ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 1u, 2u), 5, 8, 3, BIG_ENDIAN
+                0x0102u, ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 0u, 1u, 2u), 2, 5, 8, 3, BIG_ENDIAN
             ),
         )
 
         for (c in testCases) {
             println(c)
             val buf = UByteArray(c.expected.size) { 0u }
-            assertEquals(c.newIndex, c.unsignedInt.copyInto(buf, c.offset, c.encodingLength, c.byteOrder))
+            assertEquals(c.encodingLength, c.unsignedInt.copyInto(buf, c.offset, c.encodingLength, c.byteOrder).getOrThrow())
             assertContentEquals(c.expected, buf)
+
+            buf.fill(0u)
+            assertEquals(c.minLength, c.unsignedInt.copyInto(buf, c.offset, 0, c.byteOrder).getOrThrow())
 
             assertEquals(c.unsignedInt, c.expected.toUInt(c.offset, c.encodingLength, c.byteOrder))
         }
 
         assertFailsWith<IllegalArgumentException> {
-            0x01020304u.copyInto(UByteArray((8)), 5, 4, BIG_ENDIAN)
+            0x01020304u.copyInto(UByteArray((8)), 5, 4, BIG_ENDIAN).getOrThrow()
         }
     }
 
@@ -1052,14 +1056,90 @@ class UByteExtTest {
         testCases.forEachIndexed { index, c ->
             println("$index: $c")
             val buf = UByteArray(c.expected.size) { 0u }
-            assertEquals(c.newIndex, c.unsignedLong.copyInto(buf, c.offset, c.encodingLength, c.byteOrder))
+            val l = c.unsignedLong.copyInto(buf, c.offset, c.encodingLength, c.byteOrder).getOrThrow()
+            assertEquals(c.encodingLength, l)
             assertContentEquals(c.expected, buf)
 
             assertEquals(c.unsignedLong, c.expected.toULong(c.offset, c.encodingLength, c.byteOrder))
         }
 
         assertFailsWith<IllegalArgumentException> {
-            0x01020304u.copyInto(UByteArray((8)), 5, 4, BIG_ENDIAN)
+            0x01020304u.copyInto(UByteArray(8), 5, 4, BIG_ENDIAN).getOrThrow()
+        }
+    }
+
+    /**
+     * Test whether [copyInto] uses the correct minimum number of bytes if no expected encoding length is
+     * provided
+     */
+    @Test
+    fun testULongCopyIntoAutoEncodingLength() {
+        data class TestCase(
+            val unsignedLong: ULong,
+            val expected: UByteArray,
+            val offset: Int,
+            val expectedLength: Int,
+            val byteOrder: ByteOrder,
+        )
+
+        val testCases = listOf(
+            TestCase(
+                0xffu, ubyteArrayOf(0xffu, 0u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 1, BIG_ENDIAN
+            ),
+            TestCase(
+                0xffu, ubyteArrayOf(0u, 0u, 0u, 0u, 0xffu, 0u, 0u, 0u), 4, 1, BIG_ENDIAN
+            ),
+            TestCase(
+                0xffu, ubyteArrayOf(0xffu, 0u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 1, LITTLE_ENDIAN
+            ),
+            TestCase(
+                0xffuL + 1u, ubyteArrayOf(0x01u, 0u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 2, BIG_ENDIAN
+            ),
+            TestCase(
+                0xffuL + 1u, ubyteArrayOf(0u, 0x01u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 2, LITTLE_ENDIAN
+            ),
+            TestCase(
+                0x0102uL, ubyteArrayOf(0x01u, 0x02u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 2, BIG_ENDIAN
+            ),
+            TestCase(
+                0x0102uL, ubyteArrayOf(0x02u, 0x01u, 0u, 0u, 0u, 0u, 0u, 0u), 0, 2, LITTLE_ENDIAN
+            ),
+            TestCase(
+                0x010203uL, ubyteArrayOf(0x01u, 0x02u, 0x03u, 0u, 0u, 0u, 0u, 0u), 0, 3, BIG_ENDIAN
+            ),
+            TestCase(
+                0x010203uL, ubyteArrayOf(0x03u, 0x02u, 0x01u, 0u, 0u, 0u, 0u, 0u), 0, 3, LITTLE_ENDIAN
+            ),
+            TestCase(
+                0x01020304uL, ubyteArrayOf(0x01u, 0x02u, 0x03u, 0x04u, 0u, 0u, 0u, 0u), 0, 4, BIG_ENDIAN
+            ),
+            TestCase(
+                0x01020304uL, ubyteArrayOf(0x04u, 0x03u, 0x02u, 0x01u, 0u, 0u, 0u, 0u), 0, 4, LITTLE_ENDIAN
+            ),
+            TestCase(
+                0x01020304uL, ubyteArrayOf(0u, 0u, 0u, 0u, 0x01u, 0x02u, 0x03u, 0x04u), 4, 4, BIG_ENDIAN
+            ),
+            TestCase(
+                0x01020304uL, ubyteArrayOf(0u, 0u, 0u, 0u, 0x04u, 0x03u, 0x02u, 0x01u), 4, 4, LITTLE_ENDIAN
+            ),
+
+            TestCase(
+                0x0102uL, ubyteArrayOf(0u, 0u, 0u, 0u, 0u, 1u, 2u, 0u), 5, 2, BIG_ENDIAN
+            ),
+        )
+
+        testCases.forEachIndexed { index, c ->
+            println("$index: $c")
+            val buf = UByteArray(c.expected.size) { 0u }
+            val l = c.unsignedLong.copyInto(buf, c.offset, 0, c.byteOrder).getOrThrow()
+            assertEquals(c.expectedLength, l)
+            assertContentEquals(c.expected, buf)
+
+            assertEquals(c.unsignedLong, c.expected.toULong(c.offset, c.expectedLength, c.byteOrder))
+        }
+
+        assertFailsWith<IllegalArgumentException> {
+            0x01020304u.copyInto(UByteArray(8), 5, 0, BIG_ENDIAN).getOrThrow()
         }
     }
 
